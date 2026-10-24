@@ -301,7 +301,8 @@ class View:
             won = g.state == State.WON
             title = 'COLLECTION COMPLETE!' if won else 'OUT OF GRABS'
             self.text(title, 544, 357, 31, GREEN if won else RED, True, True)
-            self.text(f'{len(g.collected)} collected  /  {g.misses} misses', 544, 416, 20, MUTED, center=True)
+            miss_word = 'miss' if g.misses == 1 else 'misses'
+            self.text(f'{len(g.collected)} collected  /  {g.misses} {miss_word}', 544, 416, 20, MUTED, center=True)
             self.box(REPLAY_RECT, ORANGE, 15)
             self.text('PLAY AGAIN', REPLAY_RECT.centerx, REPLAY_RECT.y+17, 22, bold=True, center=True)
 

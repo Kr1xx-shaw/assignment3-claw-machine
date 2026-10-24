@@ -39,6 +39,9 @@ def documentation_scene(name):
         game.collected = [(0, 0), (2, 2), (3, 3)] if name == 'win' else [(0, 0)]
         game.misses = 1 if name == 'win' else 3
         game.state = State.WON if name == 'win' else State.LOST
+        game.message = 'Three collected. Your collection is complete!' if name == 'win' else 'Three empty grabs. Try a new round.'
+        collected_ids = {identity for _, identity in game.collected}
+        game.balls = [ball for ball in game.balls if ball.id not in collected_ids]
         return game
     game = actual_catch(game)
     game.aim(BIN_CENTER)

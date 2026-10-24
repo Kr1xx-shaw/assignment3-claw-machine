@@ -1,0 +1,19 @@
+# Credits and provenance
+
+- **Concept and direction:** the student's claw-machine brief, protected left
+  collector, upward air jet, win/loss rules, flat illustration and English UI.
+- **Course foundation:** SD5913 PFAD, 2026 Week 7 `Ball` class demonstration:
+  https://github.com/sd5913/pfad/tree/2026/week07 . Its separation of per-object
+  state and shared update behaviour informed this project. The claw, gate,
+  collection, input system and game rules are new implementation for this brief.
+- **Implementation assistance:** OpenAI Codex, disclosed in `PROCESS.md`.
+- **Concept illustration:** built-in OpenAI `image_gen`, revised through the
+  conversation. `assets/concept-corrected.png` is a design reference, not a
+  runtime background. The final edit prompt is in `assets/concept-prompt.txt`.
+- **Rendered game art:** procedural circles, lines, polygons and text in
+  `view.py`; no third-party sprites, photographs, audio or logo assets.
+- **Library:** Pygame 2.6.1, https://www.pygame.org/ , distributed under LGPL.
+  Python is the runtime. Pygame is installed as a dependency and not vendored.
+- **Typography:** a locally installed Segoe UI font is requested where available;
+  Pygame falls back to an available system/default font. No font file is bundled.
+
