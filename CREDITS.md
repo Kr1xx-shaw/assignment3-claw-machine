@@ -14,6 +14,7 @@
   `view.py`; no third-party sprites, photographs, audio or logo assets.
 - **Library:** Pygame 2.6.1, https://www.pygame.org/ , distributed under LGPL.
   Python is the runtime. Pygame is installed as a dependency and not vendored.
-- **Typography:** a locally installed Segoe UI font is requested where available;
-  Pygame falls back to an available system/default font. No font file is bundled.
+- **Typography:** Windows Segoe UI font files are loaded directly where available,
+  bypassing system-font discovery. Pygame's bundled default font is used if those
+  files are missing or unusable. No Windows font file is copied or redistributed.
 

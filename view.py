@@ -4,6 +4,8 @@ All labels are English. No generated bitmap is used as a gameplay background:
 the gate, claw and balls are drawn at their actual simulation positions.
 """
 import math
+import os
+from pathlib import Path
 import pygame
 import pygame.gfxdraw
 
@@ -43,7 +45,18 @@ class View:
     def font(self, size, bold=False):
         key = (size, bold)
         if key not in self.fonts:
-            self.fonts[key] = pygame.font.SysFont('segoeui', size, bold=bold)
+            # System-font discovery can crash on non-string Windows registry
+            # values. Loading a known file avoids enumerating that registry.
+            filename = 'segoeuib.ttf' if bold else 'segoeui.ttf'
+            path = Path(os.environ.get('WINDIR', r'C:\Windows')) / 'Fonts' / filename
+            try:
+                font = pygame.font.Font(str(path), size)
+                # Some invalid font files fail only on their first render.
+                font.render('Ag', True, INK)
+            except (OSError, pygame.error):
+                font = pygame.font.Font(None, size)
+                font.set_bold(bold)
+            self.fonts[key] = font
         return self.fonts[key]
 
     def text(self, text, x, y, size=20, color=INK, bold=False, center=False):

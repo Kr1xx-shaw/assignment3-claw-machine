@@ -102,12 +102,14 @@ uv run --no-project --python 3.12 python -m unittest -v test_game
 The event-loop integration check uses Pygame and a headless display:
 
 ```powershell
-uv run --no-project --python 3.12 --with pygame==2.6.1 python -m unittest -v test_game test_ui
+uv run --no-project --python 3.12 --with pygame==2.6.1 python -m unittest -v test_game test_ui test_fonts
 ```
 
 The tests cover real opposing contacts, misses, the guarded opening, delivery,
 win/loss/reset, nozzle contact, pause, frame-rate consistency and actual event-loop
-click/key handling. Automated checks do **not** replace the required human user trial.
+click/key handling. Font regressions also verify startup with broken system-font
+discovery, missing font files and a corrupt font file. Automated checks do **not**
+replace the required human user trial.
 
 Documentation screenshots can be reproduced without opening a window:
 
@@ -125,7 +127,7 @@ fixtures. Normal gameplay never calls these helpers.
 - `main.py`: window, mouse/keyboard input and main loop.
 - `model.py`: `Ball`, collision/grip logic and the round state machine.
 - `view.py`: English UI drawn from Pygame primitives; no bitmap game background.
-- `test_game.py`, `test_ui.py`: rule tests and event-loop integration test.
+- `test_game.py`, `test_ui.py`, `test_fonts.py`: rules, event-loop and font-startup tests.
 - `PROCESS.md`: design decisions, AI use and a clearly pending user-trial record.
 - `CREDITS.md`: course influence, tools and asset provenance.
 - `assets/`: actual rendered screenshots and the corrected design reference.
@@ -136,7 +138,9 @@ This is intentionally a 2D arcade simulation. Its valid-contact hold is simplifi
 there is no full rigid-body claw solver, grip-force simulation or random slipping.
 There are no sound effects, persistent scores, touch controls or live website.
 Timing and difficulty still need a real participant trial. System font selection
-may differ slightly between computers. The interface is vector-style, rendered
+may differ slightly between computers. On Windows, known Segoe UI files are
+loaded directly without enumerating the font registry; missing or unusable files
+fall back to Pygame's bundled font. The interface is vector-style, rendered
 to pixels by Pygame; the reference PNG is not an editable SVG.
 
 Before submitting, complete the real user trial in `PROCESS.md`, follow these

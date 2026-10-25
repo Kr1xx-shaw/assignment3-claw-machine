@@ -30,3 +30,15 @@ use explicit documentation state fixtures to inspect overlay layout.
 
 The classmate/user trial remains **pending**, as recorded in PROCESS.md.
 Difficulty tuning and subjective clarity must be checked during that real trial.
+
+## Follow-up: Windows font-startup failure
+
+The student's supplied traceback was reproduced by making system-font discovery
+raise the same TypeError. The renderer now loads Segoe UI files directly and
+falls back to the Pygame bundled font. Three font regressions cover broken font
+discovery, absent fonts and a corrupted font file. The event-loop test also
+disables system-font discovery with the same exception during its entire run.
+
+After the fix, all **21 tests passed** in the same cached `main-9435ffe77f63ab74`
+Python environment named in the student's traceback. A fresh `main.py
+--screenshot` invocation also rendered the startup screen successfully.

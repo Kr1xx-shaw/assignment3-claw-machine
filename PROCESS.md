@@ -75,6 +75,17 @@ Fill in after that real session (no participant name needed):
 
 ## Development history
 
+### Startup font bug reported by the student
+
+The student supplied a traceback from an actual launch: Pygame's Windows
+system-font discovery passed a non-string registry value to `splitext`, causing
+a `TypeError` before the first frame. The renderer was changed to open known
+font files directly and fall back to Pygame's bundled default if loading fails.
+An automated regression reproduced the exception before the change. Checks were
+added for the broken discovery path, missing files and a corrupted font file.
+This is a runtime bug report; the separate participant usability trial is still
+pending.
+
 Local commits should record the actual implementation and subsequent changes.
 Do not fabricate earlier commits or trial findings. Add a real commit after the
 participant-driven change, and describe what changed and why here.

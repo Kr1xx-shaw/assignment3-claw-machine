@@ -73,6 +73,7 @@ class EventLoopTests(unittest.TestCase):
                 return 16
 
         with patch('sys.argv', ['main.py']), \
+             patch('pygame.font.SysFont', side_effect=TypeError('Broken Windows font registry')), \
              patch('model.Game', return_value=game), \
              patch('pygame.display.Info', return_value=types.SimpleNamespace(current_w=1520, current_h=1020)), \
              patch('pygame.time.Clock', Clock), \
