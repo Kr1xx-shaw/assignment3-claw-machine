@@ -2,12 +2,13 @@
 
 A small desktop arcade experience: aim, catch a moving ball, and carry it to the
 guarded collection bay. Collect **3 balls** before **3 empty grabs** end the round.
+Play through **three levels** with a persistent coin wallet and same-color bonuses.
 
 Created for the individual SD5913 Assignment 3. The intended user is someone who
 wants a short, mouse-controlled arcade game with readable feedback and a clear goal.
 The interface is entirely English and drawn as flat vector-style shapes.
 
-![Actual game interface during a delivery](assets/gameplay-drop.png)
+![Actual start menu](assets/menu.png)
 
 ## Run
 
@@ -36,6 +37,9 @@ repository and its Week 4 environment.
 
 ## Play
 
+Select an unlocked level on the start screen, then press **PLAY / 200 COINS**.
+Each level entry, including NEXT LEVEL and RETRY, costs **200 coins**.
+
 1. **MOVE:** move the mouse inside the arena. The carriage follows horizontally
    at a limited speed. The dashed guide shows its current aim.
 2. **GRAB:** click inside the arena or press the GRAB button. The claw lowers,
@@ -48,11 +52,52 @@ tray. A miss is counted once when an empty claw returns. The right panel shows
 each delivered ball and the remaining room for mistakes.
 
 - **Space / Esc:** pause or resume.
-- **R / RESTART:** start a fresh round, including while holding a ball.
+- **R / RETRY:** open a confirmation to retry the current level for 200 coins.
 - **Enter:** the same action as the main button.
-- **PLAY AGAIN:** available after either result.
+- **NEXT LEVEL / PLAY AGAIN:** a new paid entry after the result screen.
 - Moving to another window automatically pauses the round; press Space on return.
 - Resize the window freely; the game keeps its aspect ratio and input coordinates.
+
+## Coins, levels and saved progress
+
+| Rule | Coins |
+| --- | ---: |
+| New campaign / confirmed RESET ALL | 500 initial coins |
+| Every level entry or retry | -200 |
+| Empty grab | -50, stopping at zero |
+| First delivered ball of each color | +100 |
+| Second / third ball of that color | +150 / +200 |
+| Each further ball of that color | Previous reward +50 |
+
+The color totals persist across levels and retries. A hold earns nothing until
+the ball reaches the left tray. The right panel shows the wallet, collected balls,
+misses and the next reward for each color. Results include entry, rewards, penalties
+and net earnings. Best earnings mean gross rewards in a completed round.
+
+1. **AIR JET:** the original filled cabinet, with a right-side upward air jet.
+2. **CROSS CURRENT:** an initially empty cabinet. Three left jets launch balls
+   toward a right-side recycler. Catch in transit and carry LEFT to score.
+3. **FAST & FURIOUS:** faster launches, changed jet angles/heights and occasional
+   capsule-shaped bullets. Bullets cannot be held; a failed attempt is an empty
+   grab. A mandatory illustrated explanation appears before every Level 3 entry.
+   Reading it is free; its START button charges the fee.
+
+Free balls entering the right recycler never count as misses. Every level still
+requires three deliveries before three empty grabs. Only a win unlocks the next
+level. The faster streams use a faster claw close but retain opposing-contact
+checks. Bullets are pass-through hazards, with no damage or health mechanic.
+
+Below 200 coins, a new entry is disabled; **RESET ALL** is the way to start over.
+Its confirmation erases funds, unlocks, color counts and best earnings, restoring
+500 coins and Level 1. A paid round can continue at zero coins and still earn rewards.
+Opening instructions, pausing and cancelling a retry never charge a fee.
+
+Progress is saved after each charge, reward, penalty and result. On Windows the
+file is `%LOCALAPPDATA%\ClawMachine\progress.json`, outside the source repository.
+Closing during a paid round ends that round without refund; the wallet, deliveries
+already rewarded and unlocked levels remain saved. Reopening requires a new paid
+entry. A corrupt save shows a warning and requires an explicit RESET ALL. A failed
+write shows an in-game warning and retains the current session in memory.
 
 ## How the interaction works
 
@@ -89,20 +134,21 @@ and released ball can enter or score. This is an explicit arcade rule.
 - Clicking outside the drop alignment keeps the ball held and gives a hint.
 - A single-finger touch or a ball outside the pocket does not count as a grip.
 - Pausing freezes the entire round, including animations and scoring.
-- Restart clears the held ball, admission permission, scores and collection.
+- Paid retry clears the current held ball, gate permission, misses and round tray;
+  it preserves the campaign wallet and color totals after charging the entry.
 
 ## Checks
 
 Model checks use only the Python standard library:
 
 ```powershell
-uv run --no-project --python 3.12 python -m unittest -v test_game
+uv run --no-project --python 3.12 python -m unittest -v test_game test_campaign
 ```
 
 The event-loop integration check uses Pygame and a headless display:
 
 ```powershell
-uv run --no-project --python 3.12 --with pygame==2.6.1 python -m unittest -v test_game test_ui test_fonts
+uv run --no-project --python 3.12 --with pygame==2.6.1 python -m unittest -v test_game test_campaign test_ui test_fonts
 ```
 
 The tests cover real opposing contacts, misses, the guarded opening, delivery,
@@ -114,7 +160,8 @@ replace the required human user trial.
 Documentation screenshots can be reproduced without opening a window:
 
 ```powershell
-uv run --no-project --python 3.12 main.py --screenshot assets/gameplay-start.png
+uv run --no-project --python 3.12 main.py --screenshot assets/menu.png
+uv run --no-project --python 3.12 main.py --scene level3 --screenshot assets/level3.png
 uv run --no-project --python 3.12 main.py --scene drop --screenshot assets/gameplay-drop.png
 ```
 
@@ -126,8 +173,9 @@ fixtures. Normal gameplay never calls these helpers.
 
 - `main.py`: window, mouse/keyboard input and main loop.
 - `model.py`: `Ball`, collision/grip logic and the round state machine.
-- `view.py`: English UI drawn from Pygame primitives; no bitmap game background.
-- `test_game.py`, `test_ui.py`, `test_fonts.py`: rules, event-loop and font-startup tests.
+- `campaign.py`: paid entries, rewards, unlocks and atomic progress storage.
+- `view.py`, `app_view.py`: English flat illustration, menu and campaign screens.
+- `test_game.py`, `test_campaign.py`, `test_ui.py`, `test_fonts.py`: behavioural checks.
 - `PROCESS.md`: design decisions, AI use and a clearly pending user-trial record.
 - `CREDITS.md`: course influence, tools and asset provenance.
 - `assets/`: actual rendered screenshots and the corrected design reference.
@@ -136,7 +184,8 @@ fixtures. Normal gameplay never calls these helpers.
 
 This is intentionally a 2D arcade simulation. Its valid-contact hold is simplified:
 there is no full rigid-body claw solver, grip-force simulation or random slipping.
-There are no sound effects, persistent scores, touch controls or live website.
+There are no sound effects, touch controls or live website. Saves are local to
+this computer; there is no account or cloud synchronization.
 Timing and difficulty still need a real participant trial. System font selection
 may differ slightly between computers. On Windows, known Segoe UI files are
 loaded directly without enumerating the font registry; missing or unusable files
@@ -144,6 +193,6 @@ fall back to Pygame's bundled font. The interface is vector-style, rendered
 to pixels by Pygame; the reference PNG is not an editable SVG.
 
 Before submitting, complete the real user trial in `PROCESS.md`, follow these
-instructions from a fresh terminal, and publish this project's own repository
-on your GitHub account. Submit that public repository URL through Canvas.
+instructions from a fresh terminal, and submit this project's public GitHub
+repository URL through Canvas.
 

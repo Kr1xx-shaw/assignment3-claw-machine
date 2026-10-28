@@ -75,6 +75,31 @@ Fill in after that real session (no participant name needed):
 
 ## Development history
 
+### Three-level coin campaign — 28 October 2026
+
+The student requested a start menu, money instead of stars, increasing same-color
+rewards, a deduction for empty grabs and two extra levels. Level 2 starts empty
+with three left-side launchers and a right recycler. Level 3 is faster, changes
+the launcher layout and introduces uncatchable bullets with a pre-level explanation.
+The student specified a 200-coin fee for every entry, plus full progress reset
+when funds are insufficient. Initial 500 coins and 50-coin miss penalties follow
+the planning proposal. A confirmed reset clears all accumulated records.
+
+Codex implemented the campaign controller, procedural start/menu illustrations,
+coin persistence and stream physics. Initial automated stream trials found no
+catches with the old slow claw closure. Closure was accelerated for Levels 2/3;
+the same two-finger geometry checks remain mandatory, and deterministic trials
+now demonstrate both real catches and misses in each stream level. This is
+automated tuning evidence, not a human playtest or proof of final difficulty.
+
+Retry is paid even through the R shortcut. Reading instructions does not charge.
+Only delivered balls earn coins; recycled free balls do not cost a miss. Closing
+the window keeps recorded coins/unlocks but forfeits the current paid round.
+Save errors are shown in the interface instead of silently discarding progress.
+
+The real trial should now also check whether the participant understands entry
+fees, same-color bonuses, the recycler, the bullet briefing and RESET ALL.
+
 ### Startup font bug reported by the student
 
 The student supplied a traceback from an actual launch: Pygame's Windows

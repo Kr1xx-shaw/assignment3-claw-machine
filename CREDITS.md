@@ -11,7 +11,9 @@
   conversation. `assets/concept-corrected.png` is a design reference, not a
   runtime background. The final edit prompt is in `assets/concept-prompt.txt`.
 - **Rendered game art:** procedural circles, lines, polygons and text in
-  `view.py`; no third-party sprites, photographs, audio or logo assets.
+  `view.py` and `app_view.py`; no third-party sprites, photographs, audio or logo assets.
+  The start menu, coin campaign, stream levels and bullet rules follow the
+  student's additional brief. Rendered menu screenshots come from game code.
 - **Library:** Pygame 2.6.1, https://www.pygame.org/ , distributed under LGPL.
   Python is the runtime. Pygame is installed as a dependency and not vendored.
 - **Typography:** Windows Segoe UI font files are loaded directly where available,

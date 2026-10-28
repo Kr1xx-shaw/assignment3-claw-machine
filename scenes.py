@@ -57,3 +57,40 @@ def documentation_scene(name):
             game.update(1/120)
     return game
 
+
+def campaign_scene(name):
+    """Isolated layout fixtures: never read or write player progress."""
+    from campaign import Campaign
+    a = Campaign(seed=7)
+    if name == 'start':
+        return a
+    if name in ('help', 'reset', 'broke'):
+        a.screen = name
+        if name == 'broke':
+            a.progress.coins = 50
+        return a
+    if name in ('briefing', 'level3'):
+        a.progress.unlocked = 3
+        a.progress.cleared[:2] = [True, True]
+        a.request_start(3)
+        if name == 'briefing':
+            return a
+        a.accept_briefing()
+    elif name == 'level2':
+        a.progress.unlocked = 2
+        a.progress.cleared[0] = True
+        a.request_start(2)
+    else:
+        a.request_start(1)
+    if name in ('level2', 'level3'):
+        for _ in range(120*4):
+            a.update(1/120)
+    elif name in ('carry', 'drop', 'win', 'loss'):
+        a.game = documentation_scene(name)
+        if name in ('win', 'loss'):
+            # Explicit layout fixtures also need matching accounting events.
+            a.game.events = [('miss', None)] * a.game.misses
+            a.game.events += [('delivery', color) for color, _ in a.game.collected]
+        a.update(0)
+    return a
+

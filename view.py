@@ -147,14 +147,20 @@ class View:
                 if len(b.trail) >= 3 and math.hypot(b.vx, b.vy) > 150:
                     points = b.trail[-5:]
                     pygame.draw.lines(self.canvas, mix(b.color, BLUE, .68), False, points, 3)
-                self.ball(b.x, b.y, b.radius, b.color)
+                if b.kind == 'bullet':
+                    self.bullet(b.x, b.y)
+                else:
+                    self.ball(b.x, b.y, b.radius, b.color)
         self.bin(g)
         self.rail(g)
         self.claw(g)
         # Authorized deliveries pass through the REAL opening, drawn on top of its floor.
         for b in g.balls:
             if b.mode == 'delivery':
-                self.ball(b.x, b.y, b.radius, b.color)
+                if b.kind == 'bullet':
+                    self.bullet(b.x, b.y)
+                else:
+                    self.ball(b.x, b.y, b.radius, b.color)
         if g.state == State.MOVE:
             self.aim_guide(g)
         if g.state == State.CARRY:
@@ -215,10 +221,27 @@ class View:
             # Visible guard line: only the current delivered ball enters this slot.
             self.line((opening_left+4, top+5), (opening_right-4, top+5), (126, 196, 168), 2)
         else:
-            self.text('OPENS FOR YOUR CATCH', BIN_CENTER, top-35, 11, MUTED, True, True)
+            self.text('OPENS FOR YOUR CATCH', BIN_CENTER, top-35 if g.level == 1 else top+81, 11, MUTED, True, True)
             self.circle(BIN_CENTER, top-2, 3, GREEN, False)
 
+    def bullet(self, x, y):
+        self.box((x-25, y-10, 50, 20), INK, 10)
+        self.line((x-15, y-8), (x-15, y+8), ORANGE, 4)
+
     def nozzle(self, g):
+        if g.level > 1:
+            for i, y in enumerate(g.jet_heights):
+                self.box((65, y-24, 76, 48), STEEL, 9)
+                self.box((130, y-16, 19, 32), INK, 5)
+                self.text(f'JET {i+1}', 74, y-9, 13, bold=True)
+                for offset in (-12, 0, 12):
+                    self.line((154, y+offset), (183, y+offset), MID_BLUE, 2)
+            self.box((973, 320, 55, 420), STEEL, 12)
+            self.box((977, 335, 15, 389), INK, 6)
+            for y in range(355, 705, 45):
+                pygame.draw.lines(self.canvas, ORANGE, False, [(997, y-5), (1004, y), (997, y+5)], 3)
+            self.text('RECYCLE', 993, 288, 12, bold=True, center=True)
+            return
         x = (NOZZLE_LEFT + NOZZLE_RIGHT)/2
         for offset in (-18, 0, 18):
             length = 46 + 15*math.sin(g.clock*4 + offset)

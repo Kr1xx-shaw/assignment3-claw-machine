@@ -13,12 +13,14 @@ from unittest.mock import patch
 import pygame
 import main
 import model
+from campaign import Campaign
 
 
 class EventLoopTests(unittest.TestCase):
     def test_real_clicks_deliver_pause_and_restart(self):
-        game = model.Game(7)
-        phase = 'aim'
+        app = Campaign(seed=7)
+        game = None
+        phase = 'menu'
         position = [350, 400]
         frames = 0
         paused_snapshot = None
@@ -27,10 +29,19 @@ class EventLoopTests(unittest.TestCase):
             return [pygame.event.Event(kind, **kwargs)]
 
         def get_events():
-            nonlocal phase, frames, paused_snapshot
+            nonlocal phase, frames, paused_snapshot, game
             frames += 1
             if frames > 1500:
                 raise AssertionError(f'UI flow timed out: {phase}, {game.state}')
+            if phase == 'menu':
+                self.assertEqual(app.screen, 'menu')
+                self.assertEqual(app.progress.coins, 500)
+                phase = 'started'
+                return event(pygame.MOUSEBUTTONDOWN, button=1, pos=(1000, 430))
+            if phase == 'started':
+                game = app.game
+                self.assertEqual(app.progress.coins, 300)
+                phase = 'aim'
             if phase == 'aim' and abs(game.claw_x-350)<1:
                 phase = 'grabbing'
                 return event(pygame.MOUSEBUTTONDOWN, button=1, pos=(350, 400))
@@ -56,14 +67,25 @@ class EventLoopTests(unittest.TestCase):
                 phase = 'restart-key'
                 return event(pygame.KEYDOWN, key=pygame.K_r)
             if phase == 'restart-key':
+                self.assertEqual(app.screen, 'retry')
+                self.assertEqual(app.progress.coins, 400)
+                phase = 'retry-confirmed'
+                return event(pygame.MOUSEBUTTONDOWN, button=1, pos=(700, 520))
+            if phase == 'retry-confirmed':
+                game = app.game
                 self.assertEqual(len(game.collected), 0)
                 self.assertEqual(game.state, model.State.MOVE)
                 self.assertFalse(game.paused)
-                self.assertEqual(game.round_number, 2)
+                self.assertEqual(app.progress.coins, 200)
                 phase = 'restart-button'
-                return event(pygame.MOUSEBUTTONDOWN, button=1, pos=(1320, 58))
+                return event(pygame.MOUSEBUTTONDOWN, button=1, pos=(940, 58))
             if phase == 'restart-button':
-                self.assertEqual(game.round_number, 3)
+                self.assertEqual(app.screen, 'retry')
+                phase = 'last-retry'
+                return event(pygame.MOUSEBUTTONDOWN, button=1, pos=(700, 520))
+            if phase == 'last-retry':
+                self.assertEqual(app.progress.coins, 0)
+                self.assertEqual(app.screen, 'play')
                 phase = 'finished'
                 return event(pygame.QUIT)
             return []
@@ -74,7 +96,7 @@ class EventLoopTests(unittest.TestCase):
 
         with patch('sys.argv', ['main.py']), \
              patch('pygame.font.SysFont', side_effect=TypeError('Broken Windows font registry')), \
-             patch('model.Game', return_value=game), \
+             patch('campaign.Campaign', return_value=app), \
              patch('pygame.display.Info', return_value=types.SimpleNamespace(current_w=1520, current_h=1020)), \
              patch('pygame.time.Clock', Clock), \
              patch('pygame.event.get', get_events), \

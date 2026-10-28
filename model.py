@@ -47,6 +47,7 @@ class Ball:
     mode: str = "free"
     jet_cooldown: float = 0
     trail: list = field(default_factory=list)
+    kind: str = "ball"
 
     @property
     def color(self):
@@ -83,7 +84,8 @@ class Game:
     A stable two-finger geometric grip creates a simplified kinematic hold.
     There are no dice rolls, nearest-ball teleports, or automatic successes.
     """
-    def __init__(self, seed=None):
+    def __init__(self, seed=None, level=1):
+        self.level = level
         self.seed = seed
         self.round_number = 0
         self.reset()
@@ -101,6 +103,11 @@ class Game:
                     vx=self.rng.uniform(-55, 65), vy=self.rng.uniform(-35, 15),
                     color_index=(row * 7 + col) % len(PALETTE),
                 ))
+        if self.level > 1:
+            self.balls = []
+        self.spawn_timer = 0.8
+        self.spawn_count = 0
+        self.events = []
         self.state = State.MOVE
         self.claw_x, self.claw_y, self.target_x = 600.0, REST_Y, 600.0
         self.close_amount = 0.0
@@ -203,7 +210,7 @@ class Game:
         dx, dy = ball.x - self.claw_x, ball.y - self.claw_y
         tip_gap = 2 * (43 - 35 * self.close_amount - FINGER_RADIUS)
         return (
-            ball.mode == "free" and self.close_amount >= 0.35
+            ball.mode == "free" and ball.kind == "ball" and self.close_amount >= 0.35
             and abs(dx) <= ball.radius * 0.65
             and 40 <= dy <= 73
             and self.claw_y + 81 > ball.y + ball.radius * 0.25
@@ -235,6 +242,8 @@ class Game:
                 break
 
     def _step(self, dt):
+        if self.level > 1:
+            self._spawn_stream(dt)
         self.clock += dt
         self.state_time += dt
         self.jet_flash = max(0.0, self.jet_flash - dt)
@@ -253,7 +262,8 @@ class Game:
                 self.message = "Closing fingers. Contact and timing decide the catch."
         elif self.state == State.CLOSE:
             if self.held_id is None:
-                self.close_amount = min(1.0, self.close_amount + dt / 0.38)
+                closing_time = .38 if self.level == 1 else .12
+                self.close_amount = min(1.0, self.close_amount + dt / closing_time)
             if self.state_time > 0.48:
                 self.set_state(State.LIFT)
                 if self.held_id is None:
@@ -267,6 +277,7 @@ class Game:
                     self.message = "Caught! Move LEFT to DROP, then click to release."
                 else:
                     self.misses += 1
+                    self.events.append(("miss", None))
                     self.set_state(State.LOST if self.misses == 3 else State.MOVE)
                     self.message = "Three empty grabs. Try a new round." if self.terminal else "Missed this time. Aim ahead of a moving ball."
         elif self.state == State.DROP:
@@ -281,17 +292,23 @@ class Game:
             if b.mode == "held":
                 continue
             b.jet_cooldown = max(0.0, b.jet_cooldown - dt)
-            b.vy = min(800, b.vy + GRAVITY * dt)
+            b.vy = min(800, b.vy + (GRAVITY if self.level == 1 or b.mode == "delivery" else (0 if b.kind == "bullet" else 22)) * dt)
             b.x += b.vx * dt
             b.y += b.vy * dt
             if b.mode == "delivery":
                 self._delivery(b)
                 continue
-            self._walls(b, dt)
+            if self.level > 1:
+                if b.x >= 972:
+                    self.balls.remove(b)
+                    continue
+                self._stream_walls(b)
+            else:
+                self._walls(b, dt)
+                self._nozzle(b)
             self._bin_guard(b)
-            self._nozzle(b)
 
-        free = [b for b in self.balls if b.mode == "free"]
+        free = [b for b in self.balls if b.mode == "free" and b.kind == "ball"]
         for _ in range(2):
             for i, a in enumerate(free):
                 for b in free[i + 1:]:
@@ -318,6 +335,38 @@ class Game:
             if int(self.clock * 120) % 4 == 0:
                 b.trail.append((b.x, b.y))
                 del b.trail[:-7]
+
+    @property
+    def jet_heights(self):
+        return (350, 420, 490) if self.level == 2 else (335, 430, 510)
+
+    def _spawn_stream(self, dt):
+        self.spawn_timer -= dt
+        if self.spawn_timer > 0:
+            return
+        self.spawn_timer += 1.05 if self.level == 2 else .78
+        lane = self.spawn_count % 3
+        # Every fourth launch is a bullet; regular balls always remain available.
+        bullet = self.level == 3 and self.spawn_count % 4 == 3
+        speed = self.rng.uniform(150, 185) if self.level == 2 else self.rng.uniform(215, 255)
+        self.balls.append(Ball(
+            1000 + self.spawn_count, 166, self.jet_heights[lane],
+            vx=speed + (65 if bullet else 0),
+            vy=0 if self.level == 2 or bullet else (-35, 5, -20)[lane],
+            radius=15 if bullet else RADIUS,
+            color_index=self.spawn_count % len(PALETTE), kind="bullet" if bullet else "ball",
+        ))
+        self.spawn_count += 1
+
+    def _stream_walls(self, b):
+        # Floor and bay deflections still feed the full-height recycler.
+        if b.x < LEFT + b.radius:
+            b.x, b.vx = LEFT + b.radius, abs(b.vx)
+        if b.y < CEILING + b.radius:
+            b.y, b.vy = CEILING + b.radius, abs(b.vy)
+        if b.y > FLOOR - b.radius:
+            b.y, b.vy = FLOOR - b.radius, -abs(b.vy) * .35
+            b.vx = max(b.vx, 95 if self.level == 2 else 150)
 
     def _walls(self, b, dt):
         r = b.radius
@@ -419,6 +468,7 @@ class Game:
         ball.x = clamp(ball.x, BIN_LEFT + 18 + ball.radius, BIN_RIGHT - 18 - ball.radius)
         if ball.y >= FLOOR - ball.radius - 14:
             self.collected.append((ball.color_index, ball.id))
+            self.events.append(("delivery", ball.color_index))
             self.balls.remove(ball)
             self.delivery_id = None
             self.grip_confirmed = False
