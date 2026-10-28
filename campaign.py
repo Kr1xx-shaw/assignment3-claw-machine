@@ -13,6 +13,7 @@ from model import Game, State
 ENTRY_COST = 200
 INITIAL_COINS = 500
 MISS_COST = 50
+GRAB_COST = 50
 LEVEL_NAMES = ('AIR JET', 'CROSS CURRENT', 'FAST & FURIOUS')
 
 
@@ -63,6 +64,8 @@ class Campaign:
         self.notice = ''
         self.notice_time = 0
         self.round_earnings = self.round_penalties = 0
+        self.round_grab_costs = 0
+        self.required_coins = ENTRY_COST + GRAB_COST
         self.round_rewards = []
         self.settled = False
         if self.path:
@@ -95,7 +98,8 @@ class Campaign:
         level = self.selected if level is None else level
         if level not in (1, 2, 3) or level > self.progress.unlocked:
             return False
-        if self.progress.coins < ENTRY_COST:
+        if self.progress.coins < ENTRY_COST + GRAB_COST:
+            self.required_coins = ENTRY_COST + GRAB_COST
             self.screen = 'broke'
             return False
         self.pending_level = level
@@ -110,13 +114,15 @@ class Campaign:
         return False
 
     def _start(self, level):
-        if self.progress.coins < ENTRY_COST:
+        if self.progress.coins < ENTRY_COST + GRAB_COST:
+            self.required_coins = ENTRY_COST + GRAB_COST
             self.screen = 'broke'
             return False
         self.progress.coins -= ENTRY_COST
         self.selected = level
         self.game = Game(self.seed, level=level)
         self.round_earnings = self.round_penalties = 0
+        self.round_grab_costs = 0
         self.round_rewards = []
         self.settled = False
         self.screen = 'play'
@@ -124,6 +130,27 @@ class Campaign:
         self.notice_time = 2.5
         self.save()
         return True
+
+    def action(self):
+        """Charge once only when a valid new lowering actually begins."""
+        if self.screen != 'play' or self.game.terminal:
+            return
+        g = self.game
+        if g.can_start_grab:
+            if self.progress.coins < GRAB_COST:
+                self.required_coins = GRAB_COST
+                self.screen = 'broke'
+                return
+            before = g.attempts
+            g.action()
+            if g.attempts != before:
+                self.progress.coins -= GRAB_COST
+                self.round_grab_costs += GRAB_COST
+                self.notice = '-50 COINS / GRAB'
+                self.notice_time = 2.5
+                self.save()
+        else:
+            g.action()  # Delivery, pause, busy or protected-bay input is free.
 
     def request_retry(self):
         if self.screen == 'play':
@@ -155,6 +182,7 @@ class Campaign:
         self.load_blocked = False
         self.round_rewards = []
         self.round_earnings = self.round_penalties = 0
+        self.round_grab_costs = 0
         self.screen = 'menu'
         self.save()
 

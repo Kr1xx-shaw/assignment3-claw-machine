@@ -35,7 +35,7 @@ def dispatch(app, action):
     elif action == 'resume' and app.screen == 'play':
         app.game.paused = False
     elif action == 'action' and app.screen == 'play':
-        app.game.action()
+        app.action()
     elif action and action.startswith('level_') and app.screen == 'menu':
         level = int(action[-1])
         if level <= app.progress.unlocked:
@@ -111,7 +111,7 @@ def main():
                         elif event.key in (pygame.K_SPACE, pygame.K_ESCAPE):
                             app.game.toggle_pause()
                         elif event.key == pygame.K_RETURN:
-                            app.game.action()
+                            app.action()
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     point = logical_position(event.pos)
                     if point:
@@ -119,7 +119,7 @@ def main():
                         if action:
                             dispatch(app, action)
                         elif app.screen == 'play' and ARENA_RECT.collidepoint(point):
-                            app.game.action()
+                            app.action()
                 # Rebuild hit targets on screen changes, not on every mouse motion.
                 if previous_ui != (app.screen, app.game.paused if app.game else False):
                     view.draw_app(app, mouse)

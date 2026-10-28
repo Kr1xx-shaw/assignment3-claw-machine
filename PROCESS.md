@@ -75,6 +75,20 @@ Fill in after that real session (no participant name needed):
 
 ## Development history
 
+### Faster streams and paid lowering
+
+The student reported that Levels 2 and 3 felt slower and easier than Level 1.
+Launch speed was raised from 150–185 to 360–430 pixels/second in Level 2 and from
+215–255 to 540–640 in Level 3. Bullet launches are faster still. The contact-based
+grip remains unchanged; simulated aim/timing trials confirm catches remain possible.
+This reported difficulty feedback is not a substitute for the pending participant trial.
+
+The student also requested a 50-coin deduction on every lowering. This is additional
+to the 200 entry fee and the existing 50 empty-grab penalty. Only a valid new descent
+charges; delivery, busy clicks and paused input do not. The charge is saved immediately.
+New entries require 250 available coins so the player can afford entry and at least
+one grab. A paid grab can finish at zero; a further grab needs 50 coins or a full reset.
+
 ### Three-level coin campaign — 28 October 2026
 
 After viewing the implemented menu, the student preferred the earlier concept's

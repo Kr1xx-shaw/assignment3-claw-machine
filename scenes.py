@@ -87,10 +87,14 @@ def campaign_scene(name):
             a.update(1/120)
     elif name in ('carry', 'drop', 'win', 'loss'):
         a.game = documentation_scene(name)
+        attempts = a.game.attempts
         if name in ('win', 'loss'):
             # Explicit layout fixtures also need matching accounting events.
-            a.game.events = [('miss', None)] * a.game.misses
-            a.game.events += [('delivery', color) for color, _ in a.game.collected]
+            attempts = len(a.game.collected) + a.game.misses
+            a.game.events = [('delivery', color) for color, _ in a.game.collected]
+            a.game.events += [('miss', None)] * a.game.misses
+        a.round_grab_costs = attempts * 50
+        a.progress.coins -= a.round_grab_costs
         a.update(0)
     return a
 

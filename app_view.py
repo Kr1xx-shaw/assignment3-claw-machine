@@ -1,7 +1,7 @@
 """English campaign screens, drawn with the same flat illustration primitives."""
 import pygame
 
-from campaign import ENTRY_COST, LEVEL_NAMES
+from campaign import ENTRY_COST, GRAB_COST, LEVEL_NAMES
 from model import State, PALETTE
 from view import View, INK, CREAM, PAPER, BLUE, MID_BLUE, ORANGE, GREEN, RED, MUTED, STEEL, mix
 
@@ -150,7 +150,7 @@ class AppView(View):
         for x in (603, 837):
             self.circle(x, 425, 3, INK, False)
 
-        enough = a.progress.coins >= ENTRY_COST and not a.load_blocked
+        enough = a.progress.coins >= ENTRY_COST + GRAB_COST and not a.load_blocked
         play = pygame.Rect(530, 476, 380, 80)
         self.box(play.move(0, 6), PALETTE[2][1] if enough else STEEL, 29, width=0)
         if enough:
@@ -161,9 +161,9 @@ class AppView(View):
         self.button('help', 'HOW TO PLAY', (597, 573, 246, 45), BLUE, size=20)
         self.text('Collect 3 to win. 3 misses end the round.', 720, 630, 20, bold=True, center=True)
         if enough:
-            self.text('Same color: 100 > 150 > 200+ coins  /  Empty grab: -50', 720, 659, 14, MUTED, center=True)
+            self.text('Each grab: -50  /  Empty grab: extra -50  /  Same color: higher rewards', 720, 659, 14, MUTED, center=True)
         else:
-            self.text('RESET ALL restores 500 coins and clears all progress.', 720, 659, 15, RED, True, True)
+            self.text('Need 250 coins: 200 entry + 50 first grab. RESET ALL to start over.', 720, 659, 14, RED, True, True)
 
         for i, name in enumerate(LEVEL_NAMES):
             x, y = 180+i*370, 694
@@ -215,8 +215,8 @@ class AppView(View):
         self.text(f'MISSES  {g.misses} / 3', 1104, 505, 20, bold=True)
         for i in range(3):
             self.circle(1288+i*34, 519, 10, RED if i < g.misses else PAPER)
-        self.text('Empty grab: -50 coins', 1104, 540, 15, MUTED)
-        self.text(f'Earned  +{a.round_earnings}    Lost  -{a.round_penalties}', 1104, 576, 16, GREEN, True)
+        self.text('Each grab -50 / Miss extra -50', 1104, 540, 14, MUTED)
+        self.text(f'Earned +{a.round_earnings} / Spent -{a.round_penalties+a.round_grab_costs}', 1104, 576, 15, GREEN, True)
         self.text('NEXT REWARD BY COLOR', 1104, 615, 11, MUTED, True)
         for i in range(6):
             x = 1121+i*47
@@ -225,12 +225,13 @@ class AppView(View):
         if g.paused:
             label, enabled = 'PAUSED', False
         elif g.state == State.MOVE:
-            label, enabled = 'GRAB', True
+            label, enabled = ('GRAB / 50 COINS' if a.progress.coins >= GRAB_COST else 'RESET ALL'), True
         elif g.state == State.CARRY:
             label, enabled = ('DROP BALL' if g.above_bin else 'MOVE LEFT TO DROP'), True
         else:
             label, enabled = {State.LOWER:'LOWERING...', State.CLOSE:'CLOSING...', State.LIFT:'LIFTING...', State.DROP:'DELIVERING...'}.get(g.state, 'FINISHED'), False
-        self.button('action', label, (1102, 700, 282, 56), enabled=enabled, size=18)
+        action = 'reset' if label == 'RESET ALL' else 'action'
+        self.button(action, label, (1102, 700, 282, 56), enabled=enabled, size=18)
 
     def footer(self, g):
         a = self.app
@@ -261,10 +262,10 @@ class AppView(View):
             else:
                 self.dashed_circle(x, 330, 29)
         self.text(f'{len(g.collected)} delivered / {g.misses} empty grabs', 720, 381, 20, MUTED, center=True)
-        self.text(f'ENTRY  -200       REWARDS  +{a.round_earnings}       MISSES  -{a.round_penalties}', 720, 433, 21, bold=True, center=True)
-        net = a.round_earnings-a.round_penalties-200
+        self.text(f'ENTRY -200 / GRABS -{a.round_grab_costs} / MISSES -{a.round_penalties} / REWARDS +{a.round_earnings}', 720, 433, 20, bold=True, center=True)
+        net = a.round_earnings-a.round_penalties-a.round_grab_costs-200
         self.text(f'ROUND TOTAL  {net:+,} COINS', 720, 477, 27, GREEN if net >= 0 else RED, True, True)
-        enough = a.progress.coins >= 200
+        enough = a.progress.coins >= ENTRY_COST + GRAB_COST
         if enough:
             if won and g.level < 3:
                 self.button('next', 'NEXT LEVEL / 200 COINS', (395, 551, 650, 62))
@@ -272,7 +273,7 @@ class AppView(View):
                 self.button('start', 'PLAY AGAIN / 200 COINS', (395, 551, 650, 62))
             self.button('menu', 'MAIN MENU', (395, 633, 650, 55), BLUE)
         else:
-            self.text('Not enough coins for another entry. Reset to start over.', 720, 545, 19, RED, True, True)
+            self.text('Need 250 coins for entry + first grab. Reset to start over.', 720, 545, 19, RED, True, True)
             self.button('reset', 'RESET ALL', (395, 599, 650, 62), ORANGE)
         self.text('Wallet and color bonuses carry over between levels.', 720, 730, 17, MUTED, center=True)
 
@@ -282,10 +283,10 @@ class AppView(View):
             ('01 / MOVE', 'Move your mouse inside the cabinet. Aim ahead of a moving ball.'),
             ('02 / GRAB', 'Click to lower the claw. Both fingers must touch a ball to hold it.'),
             ('03 / DROP', 'Carry LEFT above the short bay. Click to open the hatch and deliver.'),
-            ('COINS', 'Start with 500. Each level entry or retry costs 200. An empty grab costs 50.'),
+            ('COINS', 'Start with 500. Entry / retry: 200. Every grab: 50. Empty grab: extra 50.'),
             ('COLOR BONUS', 'Each color pays 100, then 150, then 200, increasing by 50 each time.'),
             ('PROGRESS', 'Deliver 3 to clear a level. Make 3 empty grabs and the round ends.'),
-            ('RESET ALL', 'Below 200 coins? Reset all funds, levels and records to start over.'),
+            ('RESET ALL', 'Need 250 for entry + first grab, or 50 to grab mid-round. Reset if short.'),
         ]
         for i, (title, body) in enumerate(rows):
             y = 145+i*80
@@ -307,7 +308,7 @@ class AppView(View):
         self.bullet(985, 374, 2.2)
         self.text('BULLETS', 985, 449, 25, RED, True, True)
         self.text('Cannot be grabbed. Let them pass.', 985, 497, 19, MUTED, center=True)
-        self.text('An empty grab costs 50 coins and uses one of your three misses.', 720, 603, 22, bold=True, center=True)
+        self.text('Each grab costs 50 coins. An empty grab costs another 50 and one miss.', 720, 603, 21, bold=True, center=True)
         self.text('The entry fee is charged only when you press START below.', 720, 644, 18, MUTED, center=True)
         self.button('briefing_start', 'START LEVEL 3 / 200 COINS', (395, 701, 650, 65))
         self.button('back', 'BACK', (570, 790, 300, 48), PAPER, size=18)
@@ -329,6 +330,7 @@ class AppView(View):
     def broke(self):
         self.top('INSUFFICIENT COINS')
         self.text('TIME FOR A FRESH START', 720, 270, 42, bold=True, center=True)
-        self.text('You need 200 coins to enter. Your current progress cannot continue.', 720, 360, 22, MUTED, center=True)
+        message = 'You need 50 coins to lower the claw.' if self.app.required_coins == GRAB_COST else 'You need 250 coins: 200 entry + 50 for the first grab.'
+        self.text(message, 720, 360, 22, MUTED, center=True)
         self.text('RESET ALL restores 500 coins and clears all levels and records.', 720, 411, 22, MUTED, center=True)
         self.button('reset', 'RESET ALL', (470, 520, 500, 68))

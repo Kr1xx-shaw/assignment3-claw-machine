@@ -39,6 +39,8 @@ repository and its Week 4 environment.
 
 Select an unlocked level on the start screen, then press **PLAY / 200 COINS**.
 Each level entry, including NEXT LEVEL and RETRY, costs **200 coins**.
+Every valid lowering costs another **50 coins**, whether it catches a ball or not.
+Keep at least **250 coins** to start: 200 for entry and 50 for the first grab.
 The illustrated level cards along the bottom select the level; the centered
 PLAY button shows the selected level and entry fee. The top-right badge shows
 your wallet, with RESET ALL directly below it.
@@ -67,20 +69,22 @@ each delivered ball and the remaining room for mistakes.
 | --- | ---: |
 | New campaign / confirmed RESET ALL | 500 initial coins |
 | Every level entry or retry | -200 |
-| Empty grab | -50, stopping at zero |
+| Every valid lowering | -50, paid when the claw starts descending |
+| Empty grab | An additional -50, stopping at zero |
 | First delivered ball of each color | +100 |
 | Second / third ball of that color | +150 / +200 |
 | Each further ball of that color | Previous reward +50 |
 
 The color totals persist across levels and retries. A hold earns nothing until
 the ball reaches the left tray. The right panel shows the wallet, collected balls,
-misses and the next reward for each color. Results include entry, rewards, penalties
+misses and the next reward for each color. Results include entry, lowering fees, rewards, penalties
 and net earnings. Best earnings mean gross rewards in a completed round.
 
 1. **AIR JET:** the original filled cabinet, with a right-side upward air jet.
 2. **CROSS CURRENT:** an initially empty cabinet. Three left jets launch balls
-   toward a right-side recycler. Catch in transit and carry LEFT to score.
-3. **FAST & FURIOUS:** faster launches, changed jet angles/heights and occasional
+   at 360–430 pixels/second toward a right-side recycler (about twice as fast
+   as before). Catch in transit and carry LEFT to score.
+3. **FAST & FURIOUS:** 540–640 pixels/second launches, changed jet angles/heights and occasional
    capsule-shaped bullets. Bullets cannot be held; a failed attempt is an empty
    grab. A mandatory illustrated explanation appears before every Level 3 entry.
    Reading it is free; its START button charges the fee.
@@ -90,9 +94,11 @@ requires three deliveries before three empty grabs. Only a win unlocks the next
 level. The faster streams use a faster claw close but retain opposing-contact
 checks. Bullets are pass-through hazards, with no damage or health mechanic.
 
-Below 200 coins, a new entry is disabled; **RESET ALL** is the way to start over.
+Below 250 coins, a new entry is disabled; **RESET ALL** is the way to start over.
 Its confirmation erases funds, unlocks, color counts and best earnings, restoring
-500 coins and Level 1. A paid round can continue at zero coins and still earn rewards.
+500 coins and Level 1. A grab already paid for can finish at zero coins and still
+earn delivery rewards. Below 50 coins, a new lowering is blocked and RESET ALL is
+offered. Releasing a held ball is free. Paused, busy and invalid grab clicks are free.
 Opening instructions, pausing and cancelling a retry never charge a fee.
 
 Progress is saved after each charge, reward, penalty and result. On Windows the

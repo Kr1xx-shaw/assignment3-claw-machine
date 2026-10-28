@@ -1,5 +1,23 @@
 # Validation record — 24 October 2026
 
+## Faster streams and lowering fees
+
+The latest revision passes **37 automated checks**. Three new checks cover a
+lowering fee saved immediately, invalid/busy/paused inputs staying free, blocked
+attempts without sufficient coins, and fast stream travel/removal. Existing
+campaign and event-loop expectations include the new lowering fees.
+
+Level 2 now launches at 360–430 pixels/second and Level 3 at 540–640. A clean
+uninterrupted launch reaches the recycler in about 1.9–2.2 seconds in Level 2
+and 1.3–1.5 seconds in Level 3, compared with roughly 4–5 seconds before.
+Simulated timing/aim trials still produce real opposing-contact captures and
+misses in each level. The bullet check observes the whole launch sequence,
+since a faster bullet may already have left at any single snapshot time.
+
+New rules and accounting were rendered for menu, gameplay, briefing, help and
+results. Existing player saves retain their wallet, color totals and unlocks.
+Subjective difficulty still needs the pending real participant trial.
+
 ## Campaign upgrade — 28 October 2026
 
 The subsequent centered-menu revision passed the event-loop integration and

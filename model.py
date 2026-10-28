@@ -137,6 +137,10 @@ class Game:
         return self.state in (State.WON, State.LOST)
 
     @property
+    def can_start_grab(self):
+        return not self.paused and self.state == State.MOVE and self.claw_x >= BIN_RIGHT + 58
+
+    @property
     def above_bin(self):
         ball = self.held_ball
         return bool(ball and BIN_LEFT + 18 + ball.radius <= ball.x <= BIN_RIGHT - 18 - ball.radius)
@@ -348,10 +352,10 @@ class Game:
         lane = self.spawn_count % 3
         # Every fourth launch is a bullet; regular balls always remain available.
         bullet = self.level == 3 and self.spawn_count % 4 == 3
-        speed = self.rng.uniform(150, 185) if self.level == 2 else self.rng.uniform(215, 255)
+        speed = self.rng.uniform(360, 430) if self.level == 2 else self.rng.uniform(540, 640)
         self.balls.append(Ball(
             1000 + self.spawn_count, 166, self.jet_heights[lane],
-            vx=speed + (65 if bullet else 0),
+            vx=speed + (140 if bullet else 0),
             vy=0 if self.level == 2 or bullet else (-35, 5, -20)[lane],
             radius=15 if bullet else RADIUS,
             color_index=self.spawn_count % len(PALETTE), kind="bullet" if bullet else "ball",
