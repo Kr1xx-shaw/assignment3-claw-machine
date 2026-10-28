@@ -2,6 +2,12 @@
 
 ## Campaign upgrade — 28 October 2026
 
+The subsequent centered-menu revision passed the event-loop integration and
+three font-startup regressions (four targeted checks). The actual rendered menu
+was visually inspected, including its title, central illustration, entry fee,
+wallet, level cards and reset control. The integration click was updated to the
+new PLAY button and still verifies the charge and physical delivery flow.
+
 - **34 automated tests passed** in the student's cached Pygame runtime.
   Coverage includes the original 17 physics checks, 13 campaign/storage/stream
   checks, three font regressions and the updated real-event-loop integration.

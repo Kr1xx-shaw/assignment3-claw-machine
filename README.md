@@ -39,6 +39,9 @@ repository and its Week 4 environment.
 
 Select an unlocked level on the start screen, then press **PLAY / 200 COINS**.
 Each level entry, including NEXT LEVEL and RETRY, costs **200 coins**.
+The illustrated level cards along the bottom select the level; the centered
+PLAY button shows the selected level and entry fee. The top-right badge shows
+your wallet, with RESET ALL directly below it.
 
 1. **MOVE:** move the mouse inside the arena. The carriage follows horizontally
    at a limited speed. The dashed guide shows its current aim.

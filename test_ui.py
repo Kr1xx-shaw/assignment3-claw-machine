@@ -37,7 +37,7 @@ class EventLoopTests(unittest.TestCase):
                 self.assertEqual(app.screen, 'menu')
                 self.assertEqual(app.progress.coins, 500)
                 phase = 'started'
-                return event(pygame.MOUSEBUTTONDOWN, button=1, pos=(1000, 430))
+                return event(pygame.MOUSEBUTTONDOWN, button=1, pos=(720, 510))
             if phase == 'started':
                 game = app.game
                 self.assertEqual(app.progress.coins, 300)

@@ -70,49 +70,120 @@ class AppView(View):
         self.text(subtitle, 50, 79, 14, MUTED, True)
         self.wallet()
 
+    def menu_title(self):
+        # Cache the curved lettering so the decorative title costs one blit per frame.
+        if not hasattr(self, '_menu_title'):
+            layer = pygame.Surface((1000, 142), pygame.SRCALPHA)
+            font = self.font(180, True)
+            word = 'CLAW MACHINE'
+            total = font.size(word)[0]/2
+            offset = (1000-total)/2
+            for index, char in enumerate(word):
+                left = font.size(word[:index])[0]/2
+                width = font.size(char)[0]/2
+                t = (left+width/2)/total*2-1
+                angle = -t*10
+                center = (round(offset+left+width/2), round(64+13*t*t))
+                for color, dy in ((BLUE, 10), (INK, 0)):
+                    glyph = pygame.transform.rotate(font.render(char, True, color), angle)
+                    glyph = pygame.transform.smoothscale(glyph, (max(1, glyph.get_width()//2), max(1, glyph.get_height()//2)))
+                    layer.blit(glyph, glyph.get_rect(center=(center[0], center[1]+dy)))
+            self._menu_title = layer
+        self.canvas.blit(self._menu_title, (220, 0))
+
+    def menu_claw(self, x, y, scale=1):
+        def point(dx, dy):
+            return (round(x+dx*scale), round(y+dy*scale))
+        self.box((x-14*scale, y-12*scale, 28*scale, 24*scale), STEEL, max(3, round(5*scale)))
+        self.ball(x, y+64*scale, 28*scale, PALETTE[0][1])
+        for side in (-1, 1):
+            points = [point(side*10, 10), point(side*45, 40), point(side*31, 75)]
+            pygame.draw.lines(self.canvas, INK, False, points, max(4, round(11*scale)))
+            pygame.draw.lines(self.canvas, STEEL, False, points, max(2, round(6*scale)))
+            self.circle(*point(side*45, 40), max(2, round(4*scale)), STEEL)
+
+    def level_icon(self, index, x, y):
+        if index == 0:
+            self.line((x, y-37), (x, y-17), INK, 5)
+            self.menu_claw(x, y-13, .70)
+        elif index == 1:
+            self.ball(x, y-8, 22, PALETTE[1][1])
+            for dx in (-15, 0, 15):
+                self.line((x+dx, y+26), (x+dx, y+49), INK, 3)
+            self.circle(x-23, y+54, 10, BLUE)
+            self.circle(x+23, y+54, 10, BLUE)
+        else:
+            self.circle(x, y+10, 32, BLUE)
+            self.circle(x, y+10, 16, PALETTE[2][1])
+            for dx, dy in ((-42, 0), (42, 0), (0, -42), (0, 42)):
+                self.line((x+dx, y+10+dy), (x+dx*.65, y+10+dy*.65), INK, 4)
+
     def menu(self):
         a = self.app
-        self.top('MOVE. GRAB. DROP. MAKE YOUR COLORS COUNT.')
-        self.box((48, 136, 690, 456), BLUE, 28, shadow=True)
-        self.text('A LITTLE SKILL. A LITTLE TIMING.', 393, 157, 14, MUTED, True, True)
-        self.line((120, 204), (660, 204), STEEL, 13)
-        self.line((391, 209), (391, 289), INK, 5)
-        self.box((364, 277, 54, 34), ORANGE, 9)
-        self.ball(391, 354, 48, PALETTE[0][1])
-        for side in (-1, 1):
-            points = [(391+side*16, 301), (391+side*68, 332), (391+side*49, 393), (391+side*23, 399)]
-            pygame.draw.lines(self.canvas, INK, False, points, 13)
-            pygame.draw.lines(self.canvas, STEEL, False, points, 7)
-        self.box((154, 506, 480, 20), PAPER, 8)
-        for x, y, c in ((237, 468, 1), (543, 468, 2), (478, 474, 3)):
-            self.ball(x, y, 31, PALETTE[c][1])
-        self.text('COLLECT THREE. KEEP THE COINS.', 393, 547, 18, bold=True, center=True)
+        self.menu_title()
+        self.text('M O V E .  G R A B .  D R O P .', 720, 136, 25, bold=True, center=True)
 
-        self.text('YOUR NEXT CATCH', 790, 146, 16, MUTED, True)
-        self.text(LEVEL_NAMES[a.selected-1], 790, 181, 35, bold=True)
-        self.text('3 deliveries to clear / 3 misses end the round', 790, 237, 19, MUTED)
-        self.text('Same color again? Earn more each time.', 790, 274, 20, bold=True)
-        self.text('100  >  150  >  200  >  +50 per extra ball', 790, 311, 20, GREEN, True)
-        self.text('Empty grab: -50 coins. Entry: 200 coins.', 790, 349, 18, MUTED)
+        # Compact wallet replaces the old concept's BEST SCORE badge.
+        self.box((1186, 24, 222, 52), BLUE, 19, INK, 3)
+        self.circle(1214, 50, 12, PALETTE[2][1])
+        self.text(f'{a.progress.coins:,} COINS', 1311, 34, 20, bold=True, center=True)
+        self.button('reset', 'RESET ALL', (1283, 90, 125, 32), PAPER, size=13)
+
+        self.box((493, 182, 454, 18), STEEL, 5, INK, 4)
+        self.box((692, 177, 56, 29), BLUE, 6, INK, 4)
+        self.line((720, 207), (720, 232), INK, 9)
+        self.line((720, 207), (720, 232), STEEL, 4)
+        self.menu_claw(720, 246, 1.15)
+        for side in (-1, 1):
+            self.line((720+side*84, 277), (720+side*95, 265), PALETTE[2][1], 5)
+            self.line((720+side*95, 294), (720+side*105, 289), PALETTE[2][1], 5)
+
+        # Open collection tray, with its front panel masking the lower balls.
+        pygame.draw.ellipse(self.canvas, BLUE, (520, 438, 400, 24))
+        for points in (((574, 350), (592, 340), (592, 449), (574, 449)),
+                       ((848, 340), (866, 350), (866, 449), (848, 449))):
+            pygame.draw.polygon(self.canvas, BLUE, points)
+            pygame.draw.polygon(self.canvas, INK, points, 4)
+        for x, y, color in ((653, 388, 1), (720, 403, 2), (787, 385, 3)):
+            self.ball(x, y, 33, PALETTE[color][1])
+        self.box((589, 411, 262, 42), STEEL, 6, INK, 4)
+        for x in (603, 837):
+            self.circle(x, 425, 3, INK, False)
+
         enough = a.progress.coins >= ENTRY_COST and not a.load_blocked
-        self.button('start', f'PLAY LEVEL {a.selected} / 200 COINS', (790, 400, 600, 69), enabled=enough)
-        self.button('help', 'HOW TO PLAY', (790, 486, 287, 56), PAPER, size=18)
-        self.button('reset', 'RESET ALL', (1093, 486, 297, 56), PAPER, size=18)
-        if not enough:
-            self.text('RESET ALL to restore 500 coins and start over.', 790, 559, 17, RED, True)
+        play = pygame.Rect(530, 476, 380, 80)
+        self.box(play.move(0, 6), PALETTE[2][1] if enough else STEEL, 29, width=0)
+        if enough:
+            self.buttons['start'] = play
+        self.box(play, mix(ORANGE, PAPER, .18) if enough and self.mouse and play.collidepoint(self.mouse) else (ORANGE if enough else (224, 229, 225)), 29, INK, 4)
+        self.text('PLAY' if enough else 'NOT ENOUGH COINS', 720, 478 if enough else 491, 43 if enough else 22, bold=True, center=True)
+        self.text(f'LEVEL 0{a.selected} / 200 COINS', 720, 532, 13, MUTED, True, True)
+        self.button('help', 'HOW TO PLAY', (597, 573, 246, 45), BLUE, size=20)
+        self.text('Collect 3 to win. 3 misses end the round.', 720, 630, 20, bold=True, center=True)
+        if enough:
+            self.text('Same color: 100 > 150 > 200+ coins  /  Empty grab: -50', 720, 659, 14, MUTED, center=True)
+        else:
+            self.text('RESET ALL restores 500 coins and clears all progress.', 720, 659, 15, RED, True, True)
+
         for i, name in enumerate(LEVEL_NAMES):
-            x = 48 + i*454
+            x, y = 180+i*370, 694
             unlocked = i+1 <= a.progress.unlocked and not a.load_blocked
             selected = i+1 == a.selected
-            self.box((x, 625, 435, 180), PAPER if unlocked else (231, 236, 231), 22,
-                     ORANGE if selected else MID_BLUE, 3 if selected else 2)
-            self.text(f'0{i+1}', x+22, 641, 35, GREEN if a.progress.cleared[i] else MUTED, True)
-            self.text(name, x+89, 652, 23, bold=True)
-            self.text(('CLEARED' if a.progress.cleared[i] else 'READY') if unlocked else 'LOCKED', x+24, 700, 13, MUTED, True)
-            self.text(f'Best earned: {a.progress.best[i]:,} coins', x+24, 730, 16, MUTED)
-            self.button(f'level_{i+1}', 'SELECTED' if selected else ('SELECT' if unlocked else 'LOCKED'),
-                        (x+267, 741, 146, 43), BLUE, enabled=unlocked, size=15)
-        self.text('Progress saves automatically. Closing a paid round ends it without a refund.', 48, 827, 15, MUTED)
+            border = ORANGE if selected else MUTED
+            fill = PAPER if selected else BLUE
+            self.box((x, y+5, 340, 153), PALETTE[2][1] if selected else STEEL, 20, width=0)
+            self.box((x, y, 340, 153), fill, 20, border, 4)
+            self.text(f'0{i+1}', x+23, y+8, 43, bold=True)
+            self.text(name, x+24, y+60, 19, bold=True)
+            self.level_icon(i, x+270, y+47)
+            label = ('CLEARED' if a.progress.cleared[i] else 'READY') if unlocked else 'LOCKED'
+            self.box((x+23, y+91, 125, 28), PALETTE[2][1] if unlocked else STEEL, 14, width=0)
+            self.text(label, x+85, y+94, 14, bold=True, center=True)
+            self.circle(x+31, y+135, 6, PALETTE[2][1])
+            self.text(f'BEST EARNED  {a.progress.best[i]:,} COINS', x+45, y+125, 12, MUTED, True)
+            if unlocked:
+                self.buttons[f'level_{i+1}'] = pygame.Rect(x, y, 340, 153)
+        self.text('Select a level below PLAY. Your wallet and progress save automatically.', 720, 870, 12, MUTED, center=True)
 
     def header(self, game):
         self.text('CLAW MACHINE', 34, 24, 31, bold=True)

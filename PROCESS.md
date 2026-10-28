@@ -77,6 +77,13 @@ Fill in after that real session (no participant name needed):
 
 ### Three-level coin campaign — 28 October 2026
 
+After viewing the implemented menu, the student preferred the earlier concept's
+centered composition. The start screen was revised to use a large curved title,
+a central claw and open tray, a prominent PLAY button, HOW TO PLAY below it and
+three illustrated level cards along the bottom. The earlier BEST SCORE badge
+became a coin wallet; stars became best-earnings records. The paid-entry rules,
+new levels, unlocks and persistent progress remain part of this layout.
+
 The student requested a start menu, money instead of stars, increasing same-color
 rewards, a deduction for empty grabs and two extra levels. Level 2 starts empty
 with three left-side launchers and a right recycler. Level 3 is faster, changes
