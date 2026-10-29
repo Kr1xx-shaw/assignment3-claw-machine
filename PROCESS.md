@@ -75,6 +75,15 @@ Fill in after that real session (no participant name needed):
 
 ## Development history
 
+### Lower entry fee — 29 October 2026
+
+The student reduced every level-entry fee from 200 to 100 coins. Initial PLAY,
+NEXT LEVEL, PLAY AGAIN and confirmed RETRY all charge 100 once. Starting a new
+round requires 150 available coins, covering entry and the first 50-coin grab.
+The controller, buttons, entry notice, result arithmetic and instructions now
+use the shared entry-cost constant. Existing saved balances are retained without
+retroactively changing earlier transactions.
+
 ### Stronger bullet-time slowdown — 29 October 2026
 
 The student requested a further 20% speed reduction during bullet time. Applied

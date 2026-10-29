@@ -40,7 +40,7 @@ class EventLoopTests(unittest.TestCase):
                 return event(pygame.MOUSEBUTTONDOWN, button=1, pos=(720, 510))
             if phase == 'started':
                 game = app.game
-                self.assertEqual(app.progress.coins, 300)
+                self.assertEqual(app.progress.coins, 400)
                 phase = 'aim'
             if phase == 'aim' and abs(game.claw_x-350)<1:
                 phase = 'grabbing'
@@ -68,7 +68,7 @@ class EventLoopTests(unittest.TestCase):
                 return event(pygame.KEYDOWN, key=pygame.K_r)
             if phase == 'restart-key':
                 self.assertEqual(app.screen, 'retry')
-                self.assertEqual(app.progress.coins, 350)
+                self.assertEqual(app.progress.coins, 450)
                 phase = 'retry-confirmed'
                 return event(pygame.MOUSEBUTTONDOWN, button=1, pos=(700, 520))
             if phase == 'retry-confirmed':
@@ -76,7 +76,7 @@ class EventLoopTests(unittest.TestCase):
                 self.assertEqual(len(game.collected), 0)
                 self.assertEqual(game.state, model.State.MOVE)
                 self.assertFalse(game.paused)
-                self.assertEqual(app.progress.coins, 150)
+                self.assertEqual(app.progress.coins, 350)
                 phase = 'restart-button'
                 return event(pygame.MOUSEBUTTONDOWN, button=1, pos=(940, 58))
             if phase == 'restart-button':
@@ -84,8 +84,8 @@ class EventLoopTests(unittest.TestCase):
                 phase = 'last-retry'
                 return event(pygame.MOUSEBUTTONDOWN, button=1, pos=(700, 520))
             if phase == 'last-retry':
-                self.assertEqual(app.progress.coins, 150)
-                self.assertEqual(app.screen, 'broke')
+                self.assertEqual(app.progress.coins, 250)
+                self.assertEqual(app.screen, 'play')
                 phase = 'finished'
                 return event(pygame.QUIT)
             return []

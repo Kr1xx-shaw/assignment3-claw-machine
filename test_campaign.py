@@ -48,26 +48,26 @@ class EconomyTests(unittest.TestCase):
         self.assertFalse(a.request_start(2))
         self.assertTrue(a.request_start(1))
         self.assertFalse(a.request_start(1))
-        self.assertEqual(a.progress.coins, 300)
+        self.assertEqual(a.progress.coins, 400)
         a.game.toggle_pause()
         a.update(10)
-        self.assertEqual(a.progress.coins, 300)
+        self.assertEqual(a.progress.coins, 400)
 
     def test_paid_retry_cancel_and_confirm_preserve_color_history(self):
         a = Campaign(seed=7)
         a.request_start()
         deliver(a)
-        self.assertEqual(a.progress.coins, 350)
+        self.assertEqual(a.progress.coins, 450)
         previous = a.game
         a.request_retry()
         a.update(20)
         a.cancel()
         self.assertIs(a.game, previous)
-        self.assertEqual(a.progress.coins, 350)
+        self.assertEqual(a.progress.coins, 450)
         a.request_retry()
         a.request_start(1)
         self.assertIsNot(a.game, previous)
-        self.assertEqual(a.progress.coins, 150)
+        self.assertEqual(a.progress.coins, 350)
         self.assertEqual(a.progress.colors[0], 1)
         self.assertEqual(a.game.collected, [])
 
@@ -77,17 +77,17 @@ class EconomyTests(unittest.TestCase):
         for i in range(3):
             deliver(a, identity=100+i)
         self.assertEqual(a.round_rewards, [100, 200, 200])
-        self.assertEqual(a.progress.coins, 650)
+        self.assertEqual(a.progress.coins, 750)
         self.assertEqual(a.progress.unlocked, 2)
         self.assertEqual(a.screen, 'result')
         a.update(20)
-        self.assertEqual(a.progress.coins, 650)
+        self.assertEqual(a.progress.coins, 750)
         a.request_start(2)
-        self.assertEqual(a.progress.coins, 450)
+        self.assertEqual(a.progress.coins, 650)
         self.assertEqual(a.game.balls, [])
         deliver(a)
         self.assertEqual(a.round_rewards, [200])
-        self.assertEqual(a.progress.coins, 600)
+        self.assertEqual(a.progress.coins, 800)
 
     def test_different_color_keeps_its_first_reward(self):
         a = Campaign(seed=7)
@@ -107,16 +107,16 @@ class EconomyTests(unittest.TestCase):
             for _ in range(10):
                 a.action()
             step_until(a, lambda: a.game.state in (State.MOVE, State.LOST))
-            self.assertEqual(a.progress.coins, 300-count*100)
+            self.assertEqual(a.progress.coins, 400-count*100)
             self.assertEqual(a.game.misses, count)
         self.assertEqual(a.screen, 'result')
         self.assertFalse(a.request_start())
         self.assertEqual(a.screen, 'broke')
-        self.assertEqual(a.progress.coins, 0)
+        self.assertEqual(a.progress.coins, 100)
 
     def test_last_fifty_coins_allow_a_complete_grab_and_delivery(self):
         a = Campaign(seed=7)
-        a.progress.coins = 250
+        a.progress.coins = 150
         a.request_start()
         deliver(a)
         self.assertEqual(a.progress.coins, 100)
@@ -130,27 +130,27 @@ class EconomyTests(unittest.TestCase):
             a.request_start()
             a.game.claw_x = BIN_CENTER
             a.action()
-            self.assertEqual(a.progress.coins, 300)
+            self.assertEqual(a.progress.coins, 400)
             a.game.claw_x = 600
             a.game.toggle_pause()
             a.action()
-            self.assertEqual(a.progress.coins, 300)
+            self.assertEqual(a.progress.coins, 400)
             a.game.toggle_pause()
             a.action()
-            self.assertEqual(a.progress.coins, 250)
-            self.assertEqual(Campaign(path).progress.coins, 250)
+            self.assertEqual(a.progress.coins, 350)
+            self.assertEqual(Campaign(path).progress.coins, 350)
             for _ in range(20):
                 a.action()
-            self.assertEqual(a.progress.coins, 250)
+            self.assertEqual(a.progress.coins, 350)
             self.assertEqual(a.game.attempts, 1)
             self.assertEqual(a.round_grab_costs, 50)
 
     def test_insufficient_grab_funds_block_without_overdraft(self):
         a = Campaign(seed=7)
-        a.progress.coins = 249
+        a.progress.coins = 149
         self.assertFalse(a.request_start())
-        self.assertEqual(a.progress.coins, 249)
-        self.assertEqual(a.required_coins, 250)
+        self.assertEqual(a.progress.coins, 149)
+        self.assertEqual(a.required_coins, 150)
         a.ask_reset()
         a.confirm_reset()
         a.request_start()
@@ -175,13 +175,13 @@ class EconomyTests(unittest.TestCase):
         a.request_start(3)
         self.assertTrue(a.accept_briefing())
         self.assertFalse(a.accept_briefing())
-        self.assertEqual(a.progress.coins, 300)
+        self.assertEqual(a.progress.coins, 400)
         a.request_retry()
         a.request_start(3)
         self.assertEqual(a.screen, 'briefing')
-        self.assertEqual(a.progress.coins, 300)
+        self.assertEqual(a.progress.coins, 400)
         a.accept_briefing()
-        self.assertEqual(a.progress.coins, 100)
+        self.assertEqual(a.progress.coins, 300)
 
     def test_campaign_can_clear_all_levels_and_reset_clears_every_record(self):
         a = Campaign(seed=7)
@@ -194,7 +194,7 @@ class EconomyTests(unittest.TestCase):
             self.assertEqual(a.game.state, State.WON)
         self.assertEqual(a.progress.cleared, [True]*3)
         self.assertEqual(a.progress.colors[0], 9)
-        self.assertEqual(a.progress.coins, 1150)
+        self.assertEqual(a.progress.coins, 1450)
         before = copy.deepcopy(a.progress)
         a.ask_reset()
         a.cancel()
@@ -218,7 +218,7 @@ class StorageTests(unittest.TestCase):
             self.assertEqual(b.screen, 'menu')
             self.assertIsNone(b.game)
             b.request_start()
-            self.assertEqual(b.progress.coins, 150)
+            self.assertEqual(b.progress.coins, 350)
             b.ask_reset()
             b.confirm_reset()
             self.assertEqual(Campaign(path).progress, Progress())
@@ -241,7 +241,7 @@ class StorageTests(unittest.TestCase):
         with patch('pathlib.Path.mkdir', side_effect=OSError('read only')):
             self.assertTrue(a.request_start())
             self.assertIn('memory', a.save_error)
-            self.assertEqual(a.progress.coins, 300)
+            self.assertEqual(a.progress.coins, 400)
 
 
 class StreamTests(unittest.TestCase):

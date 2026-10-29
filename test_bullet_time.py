@@ -89,7 +89,7 @@ class BulletTimeTests(unittest.TestCase):
         a.request_start(3)
         a.accept_briefing()
         a.game.start_bullet_time()
-        self.assertEqual(a.progress.coins, 300)
+        self.assertEqual(a.progress.coins, 400)
         a.request_retry()
         self.assertFalse(a.game.bullet_time_active)
         a.cancel()
@@ -100,7 +100,7 @@ class BulletTimeTests(unittest.TestCase):
         a.accept_briefing()
         self.assertEqual(a.game.bullet_time_left, 3)
         self.assertFalse(a.game.bullet_time_active)
-        self.assertEqual(a.progress.coins, 100)
+        self.assertEqual(a.progress.coins, 300)
 
     def test_confirmed_hold_is_stable_during_slow_time_and_release(self):
         g = Game(7, 3)
@@ -269,7 +269,7 @@ class KeyboardTests(unittest.TestCase):
                 self.assertFalse(g.bullet_time_active)
                 self.assertFalse(g.paused)
                 self.assertEqual(g.bullet_time_left, 0)
-                self.assertEqual(a.progress.coins, 300)
+                self.assertEqual(a.progress.coins, 400)
                 return [pygame.event.Event(pygame.QUIT)]
             raise AssertionError('Keyboard flow did not finish.')
 

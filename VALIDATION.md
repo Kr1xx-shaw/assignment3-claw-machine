@@ -1,5 +1,12 @@
 # Validation record — 24 October 2026
 
+## Entry fee reduced to 100 — 29 October 2026
+
+All **53 tests passed** with updated wallet expectations for initial entry,
+next-level entry, repeated paid retry, save/reopen and the 150-coin affordability
+boundary. Lowering and miss fees retain their existing checks. Menu, gameplay,
+briefing and results were rendered with the new fee and visually inspected.
+
 ## Stronger bullet time — 29 October 2026
 
 All 12 targeted bullet-time checks passed after reducing speed to 66.4% of normal

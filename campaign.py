@@ -10,7 +10,7 @@ from pathlib import Path
 
 from model import Game, State
 
-ENTRY_COST = 200
+ENTRY_COST = 100
 INITIAL_COINS = 500
 MISS_COST = 50
 GRAB_COST = 50
@@ -126,7 +126,7 @@ class Campaign:
         self.round_rewards = []
         self.settled = False
         self.screen = 'play'
-        self.notice = '-200 COINS / ENTRY'
+        self.notice = f'-{ENTRY_COST} COINS / ENTRY'
         self.notice_time = 2.5
         self.save()
         return True

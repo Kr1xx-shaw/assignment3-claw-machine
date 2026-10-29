@@ -37,10 +37,10 @@ repository and its Week 4 environment.
 
 ## Play
 
-Select an unlocked level on the start screen, then press **PLAY / 200 COINS**.
-Each level entry, including NEXT LEVEL and RETRY, costs **200 coins**.
+Select an unlocked level on the start screen, then press **PLAY / 100 COINS**.
+Each level entry, including NEXT LEVEL and RETRY, costs **100 coins**.
 Every valid lowering costs another **50 coins**, whether it catches a ball or not.
-Keep at least **250 coins** to start: 200 for entry and 50 for the first grab.
+Keep at least **150 coins** to start: 100 for entry and 50 for the first grab.
 The illustrated level cards along the bottom select the level; the centered
 PLAY button shows the selected level and entry fee. The top-right badge shows
 your wallet, with RESET ALL directly below it.
@@ -58,7 +58,7 @@ each delivered ball and the remaining room for mistakes.
 
 - **Esc:** pause or resume in every level. Space never pauses the game.
 - **Hold Space (Level 3 only):** slow free balls and bullets by 33.6%; release to restore speed.
-- **R / RETRY:** open a confirmation to retry the current level for 200 coins.
+- **R / RETRY:** open a confirmation to retry the current level for 100 coins.
 - **Enter:** the same action as the main button.
 - **NEXT LEVEL / PLAY AGAIN:** a new paid entry after the result screen.
 - Moving to another window automatically pauses the round; press Esc on return.
@@ -69,7 +69,7 @@ each delivered ball and the remaining room for mistakes.
 | Rule | Coins |
 | --- | ---: |
 | New campaign / confirmed RESET ALL | 500 initial coins |
-| Every level entry or retry | -200 |
+| Every level entry or retry | -100 |
 | Every valid lowering | -50, paid when the claw starts descending |
 | Empty grab | An additional -50, stopping at zero |
 | First delivered ball of each color | +100 |
@@ -110,7 +110,7 @@ requires three deliveries before three empty grabs. Only a win unlocks the next
 level. The faster streams use a faster claw close but retain opposing-contact
 checks. Bullets are pass-through hazards, with no damage or health mechanic.
 
-Below 250 coins, a new entry is disabled; **RESET ALL** is the way to start over.
+Below 150 coins, a new entry is disabled; **RESET ALL** is the way to start over.
 Its confirmation erases funds, unlocks, color counts and best earnings, restoring
 500 coins and Level 1. A grab already paid for can finish at zero coins and still
 earn delivery rewards. Below 50 coins, a new lowering is blocked and RESET ALL is
