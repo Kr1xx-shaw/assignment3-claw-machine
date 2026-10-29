@@ -121,8 +121,94 @@ class BulletTimeTests(unittest.TestCase):
         self.assertAlmostEqual(ball.x-g.claw_x, g.held_offset[0])
         self.assertAlmostEqual(ball.y-g.claw_y, g.held_offset[1])
 
+    def test_countdown_expires_after_three_unscaled_seconds(self):
+        g = Game(7, 3)
+        g.start_bullet_time()
+        self.assertEqual(g.bullet_time_remaining, 3.0)
+        advance(g, 359)
+        self.assertTrue(g.bullet_time_active)
+        self.assertGreater(g.bullet_time_remaining, 0)
+        advance(g, 1)
+        self.assertFalse(g.bullet_time_active)
+        self.assertEqual(g.bullet_time_remaining, 0)
+        self.assertEqual(g.bullet_time_left, 2)
+        advance(g, 240)
+        self.assertEqual(g.bullet_time_left, 2)
+
+    def test_slow_frame_cannot_extend_timer_and_release_clears_countdown(self):
+        g = Game(7, 3)
+        g.start_bullet_time()
+        g.update(3.0)
+        self.assertFalse(g.bullet_time_active)
+        self.assertEqual(g.bullet_time_remaining, 0)
+        g.start_bullet_time()
+        advance(g, 60)
+        g.end_bullet_time()
+        self.assertEqual(g.bullet_time_remaining, 0)
+        self.assertEqual(g.bullet_time_left, 1)
+
+    def test_dark_filter_preserves_ball_colors_and_does_not_cover_ui(self):
+        from app_view import AppView
+        a = Campaign(seed=7)
+        a.progress.unlocked = 3
+        a.request_start(3)
+        a.accept_briefing()
+        a.game.balls = [Ball(100, 650, 420)]
+        a.game.collected = [(0, 77)]
+        v = AppView()
+        before = v.draw_app(a).copy()
+        a.game.start_bullet_time()
+        filtered = v.draw_app(a).copy()
+        for point in ((650, 420), (121, 709), (1120, 130)):
+            self.assertEqual(before.get_at(point), filtered.get_at(point))
+        for original, dark in zip(before.get_at((800, 600))[:3], filtered.get_at((800, 600))[:3]):
+            self.assertLess(dark, original)
+        a.game.end_bullet_time()
+        after = v.draw_app(a)
+        self.assertEqual(before.get_at((800, 600)), after.get_at((800, 600)))
+
 
 class KeyboardTests(unittest.TestCase):
+    def test_held_space_after_expiry_cannot_spend_another_use_until_released(self):
+        a = Campaign(seed=7)
+        a.progress.unlocked = 3
+        a.request_start(3)
+        a.accept_briefing()
+        phase = 0
+
+        def event(kind):
+            return [pygame.event.Event(kind, key=pygame.K_SPACE)]
+
+        def events():
+            nonlocal phase
+            phase += 1
+            if phase in (1, 2, 4, 6):
+                if phase == 4:
+                    self.assertFalse(a.game.bullet_time_active)
+                    self.assertEqual(a.game.bullet_time_left, 2)
+                return event(pygame.KEYDOWN)
+            if phase == 3:
+                return []
+            if phase == 5:
+                self.assertFalse(a.game.bullet_time_active)
+                self.assertEqual(a.game.bullet_time_left, 2)
+                return event(pygame.KEYUP)
+            if phase == 7:
+                self.assertTrue(a.game.bullet_time_active)
+                self.assertEqual(a.game.bullet_time_left, 1)
+                return [pygame.event.Event(pygame.QUIT)]
+            raise AssertionError('Expiry key flow did not finish.')
+
+        class Clock:
+            def tick(self, fps):
+                return 1000
+
+        with patch('sys.argv', ['main.py']), \
+             patch('campaign.Campaign', return_value=a), \
+             patch('pygame.time.Clock', Clock), \
+             patch('pygame.event.get', events):
+            self.assertEqual(main.main(), 0)
+
     def test_real_space_hold_repeat_release_esc_and_focus_loss(self):
         a = Campaign(seed=7)
         a.progress.unlocked = 3

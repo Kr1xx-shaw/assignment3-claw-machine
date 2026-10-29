@@ -84,10 +84,16 @@ only in all levels. Space now has no action in Levels 1 and 2.
 Each new Space press in Level 3 consumes one use and slows free balls, bullets
 and the launch stream to 83% while held. The claw and delivered balls remain at
 normal speed. Release restores normal timing without changing stored velocities,
-so repeated presses do not compound the slowdown. A continuous hold has no extra
-time limit. Repeated key events are ignored. The right panel and pre-level
-briefing explain the control and remaining uses. This uses existing procedural
-illustration rather than adding external art assets.
+so repeated presses do not compound the slowdown. The student then requested a
+dark environmental filter and a 3.0-second countdown. Each activation now lasts
+up to three ordinary seconds, even during slow frames. Holding beyond expiry
+cannot spend another use; the player must release and press again.
+
+The cabinet is darkened by a translucent layer with transparent masks over the
+balls, including held and collected balls, preserving their existing art and
+occlusion. The wallet and controls remain outside the filter. The right panel
+shows seconds left and remaining uses; the pre-level briefing explains the limit.
+This uses existing procedural illustration rather than adding external art.
 
 Pause, focus loss, retry/reset screens and results end the effect. A spent use
 is not refunded; a fresh paid Level 3 round gets three uses. Automated tests

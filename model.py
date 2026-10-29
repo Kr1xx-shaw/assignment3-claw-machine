@@ -19,6 +19,7 @@ RADIUS, GRAVITY, FINGER_RADIUS = 24.0, 365.0, 5.0
 FIXED_DT = 1 / 120
 BULLET_TIME_SCALE = 0.83
 BULLET_TIME_USES = 3
+BULLET_TIME_DURATION = 3.0
 PALETTE = (
     ("CORAL", (248, 111, 106)), ("SKY", (72, 152, 234)),
     ("LEMON", (249, 201, 78)), ("MINT", (75, 190, 161)),
@@ -122,6 +123,7 @@ class Game:
         self.paused = False
         self.bullet_time_left = BULLET_TIME_USES if self.level == 3 else 0
         self.bullet_time_held = False
+        self.bullet_time_remaining = 0.0
         self.clock = 0.0
         self.state_time = 0.0
         self.accumulator = 0.0
@@ -149,10 +151,12 @@ class Game:
             return False
         self.bullet_time_left -= 1
         self.bullet_time_held = True
+        self.bullet_time_remaining = BULLET_TIME_DURATION
         return True
 
     def end_bullet_time(self):
         self.bullet_time_held = False
+        self.bullet_time_remaining = 0.0
 
     def set_paused(self, paused):
         self.paused = paused
@@ -262,6 +266,12 @@ class Game:
     def update(self, elapsed):
         if self.paused or self.terminal:
             return
+        # Count down unscaled elapsed time, including time discarded by the
+        # physics catch-up cap after a slow frame. Holding cannot extend a use.
+        if self.bullet_time_active:
+            self.bullet_time_remaining = max(0.0, self.bullet_time_remaining - max(0.0, elapsed - 0.1))
+            if self.bullet_time_remaining <= 1e-9:
+                self.end_bullet_time()
         self.accumulator += min(max(elapsed, 0.0), 0.1)
         while self.accumulator >= FIXED_DT:
             self._step(FIXED_DT)
@@ -271,7 +281,8 @@ class Game:
                 break
 
     def _step(self, dt):
-        world_dt = dt * (BULLET_TIME_SCALE if self.bullet_time_active else 1)
+        slow_dt = min(dt, self.bullet_time_remaining) if self.bullet_time_active else 0.0
+        world_dt = dt - slow_dt * (1 - BULLET_TIME_SCALE)
         if self.level > 1:
             self._spawn_stream(world_dt)
         self.clock += dt
@@ -370,6 +381,10 @@ class Game:
             if int(self.clock * 120) % 4 == 0:
                 b.trail.append((b.x, b.y))
                 del b.trail[:-7]
+        if self.bullet_time_active:
+            self.bullet_time_remaining = max(0.0, self.bullet_time_remaining - dt)
+            if self.bullet_time_remaining <= 1e-9:
+                self.end_bullet_time()
 
     @property
     def jet_heights(self):

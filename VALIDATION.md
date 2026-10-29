@@ -1,5 +1,17 @@
 # Validation record — 24 October 2026
 
+## Bullet-time filter and countdown — 29 October 2026
+
+All **53 automated tests passed**. Four additional checks verify expiry after
+three unscaled seconds, expiry across a long frame, early-release cancellation,
+and held-key repeat behavior after expiry. The visual check compares rendered
+pixels to confirm cabinet dimming while ball colors, collected balls and UI
+remain unchanged, then verifies normal background restoration on release.
+
+The active filter/countdown, inactive state, instructions and Level 3 briefing
+were rendered and visually inspected. Every level continues to use Esc only
+for manual pause/resume. Real participant validation remains pending.
+
 ## Level 3 bullet time and Esc-only pause — 29 October 2026
 
 All **49 automated tests passed**. Eight new checks cover the three-use limit,

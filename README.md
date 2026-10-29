@@ -90,10 +90,14 @@ and net earnings. Best earnings mean gross rewards in a completed round.
    Reading it is free; its START button charges the fee.
    **Bullet time:** hold Space for 83% ball/bullet speed; release for normal speed.
    There are three activations per paid Level 3 round. A continuous hold uses one
-   activation, with no additional time limit. Repeated key events do not use extra
-   chances. The claw and released deliveries keep their normal speed. The launch
+   activation, lasting at most **3.0 seconds**. The visible countdown uses ordinary
+   time, so the slowdown does not stretch its duration. At zero, speed restores;
+   release and press Space again to use another chance. Repeated key events do
+   not use extra chances. The claw and released deliveries keep their normal speed. The launch
    stream also slows so extra balls do not pile up. The right panel shows three
-   remaining-use dots and whether the effect is active.
+   remaining-use dots, active status and seconds left. While active, a dark filter
+   covers the cabinet environment while balls keep their original brightness.
+   The collection panel, wallet and controls stay readable.
 
 Pausing, switching windows, opening retry/reset or ending the round cancels active
 bullet time. The spent use is not refunded. Resume with Esc; a new activation needs

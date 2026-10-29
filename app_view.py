@@ -2,7 +2,7 @@
 import pygame
 
 from campaign import ENTRY_COST, GRAB_COST, LEVEL_NAMES
-from model import State, PALETTE
+from model import State, PALETTE, BIN_LEFT, FLOOR
 from view import View, INK, CREAM, PAPER, BLUE, MID_BLUE, ORANGE, GREEN, RED, MUTED, STEEL, mix
 
 
@@ -33,6 +33,8 @@ class AppView(View):
         if app.screen == 'play':
             self.header(app.game)
             self.machine(app.game)
+            if app.game.bullet_time_active:
+                self.bullet_time_filter(app.game)
             self.sidebar(app.game, mouse)
             self.footer(app.game)
             if app.game.paused:
@@ -195,6 +197,21 @@ class AppView(View):
         self.button('retry', 'RETRY / 200', (870, 36, 183, 43), PAPER, size=16)
         self.wallet(1102, 24)
 
+    def bullet_time_filter(self, g):
+        # Darken the cabinet through a translucent layer with transparent
+        # circles over the existing balls; their original art/occlusion stays.
+        rect = pygame.Rect(32, 118, 1024, 664)
+        veil = pygame.Surface(rect.size, pygame.SRCALPHA)
+        pygame.draw.rect(veil, (12, 24, 42, 115), veil.get_rect(), border_radius=22)
+        for ball in g.balls:
+            if ball.kind == 'ball':
+                center = (round(ball.x-rect.x), round(ball.y-rect.y))
+                pygame.draw.circle(veil, (0, 0, 0, 0), center, round(ball.radius+2))
+        for i, _ in enumerate(g.collected):
+            center = (round(BIN_LEFT+43+i*54-rect.x), round(FLOOR-37-rect.y))
+            pygame.draw.circle(veil, (0, 0, 0, 0), center, 21)
+        self.canvas.blit(veil, rect)
+
     def sidebar(self, g, mouse):
         a = self.app
         self.box((1080, 118, 328, 664), PAPER, 22, shadow=True)
@@ -223,8 +240,10 @@ class AppView(View):
             self.text(f'{g.bullet_time_left}/3', 1261, 620, 14, MUTED, True, True)
             for i in range(3):
                 self.circle(1310+i*25, 631, 7, ORANGE if i < g.bullet_time_left else STEEL)
-            status = 'ACTIVE / SPEED -17%' if g.bullet_time_active else ('HOLD SPACE / 3 USES PER ROUND' if g.bullet_time_left else 'NO USES LEFT')
+            status = 'ACTIVE / SPEED -17%' if g.bullet_time_active else ('HOLD SPACE / 3s PER USE' if g.bullet_time_left else 'NO USES LEFT')
             self.text(status, 1114, 652, 12, GREEN if g.bullet_time_active else MUTED, True)
+            if g.bullet_time_active:
+                self.text(f'{g.bullet_time_remaining:.1f}s', 1343, 644, 24, GREEN, True, True)
         else:
             self.text('NEXT REWARD BY COLOR', 1104, 615, 11, MUTED, True)
             for i in range(6):
@@ -299,7 +318,7 @@ class AppView(View):
             ('COINS', 'Start with 500. Entry / retry: 200. Every grab: 50. Empty grab: extra 50.'),
             ('COLOR BONUS', 'First delivery of a color: +100. Every later ball of that color: +200.'),
             ('PROGRESS', 'Deliver 3 to clear a level. Make 3 empty grabs and the round ends.'),
-            ('BULLET TIME', 'Level 3: hold SPACE to slow balls and bullets 17%. Release to stop. 3 uses per round.'),
+            ('BULLET TIME', 'Level 3: hold SPACE for -17% speed. 3 uses, up to 3.0s each. Release to stop early.'),
             ('RESET ALL', 'Need 250 for entry + first grab, or 50 to grab mid-round. Reset if short.'),
         ]
         for i, (title, body) in enumerate(rows):
@@ -322,7 +341,7 @@ class AppView(View):
         self.bullet(985, 374, 2.2)
         self.text('BULLETS', 985, 449, 25, RED, True, True)
         self.text('Cannot be grabbed. Let them pass.', 985, 497, 19, MUTED, center=True)
-        self.text('HOLD SPACE: BALLS & BULLETS -17% SPEED / 3 USES', 720, 580, 22, GREEN, True, True)
+        self.text('HOLD SPACE: -17% SPEED / 3 USES / 3.0s EACH', 720, 580, 22, GREEN, True, True)
         self.text('Release to restore speed. ESC pauses. Each grab costs 50; an empty grab costs 50 more.', 720, 618, 17, bold=True, center=True)
         self.text('The entry fee is charged only when you press START below.', 720, 644, 18, MUTED, center=True)
         self.button('briefing_start', 'START LEVEL 3 / 200 COINS', (395, 701, 650, 65))
