@@ -215,8 +215,8 @@ class Game:
         tip_gap = 2 * (43 - 35 * self.close_amount - FINGER_RADIUS)
         return (
             ball.mode == "free" and ball.kind == "ball" and self.close_amount >= 0.35
-            and abs(dx) <= ball.radius * 0.65
-            and 40 <= dy <= 73
+            and abs(dx) <= ball.radius * 0.75
+            and 36 <= dy <= 75
             and self.claw_y + 81 > ball.y + ball.radius * 0.25
             and tip_gap < ball.radius * 1.85
             and self.finger_contact(ball, -1) and self.finger_contact(ball, 1)
@@ -274,16 +274,6 @@ class Game:
                     self.message = "Empty grip. Returning to the rail."
         elif self.state == State.LIFT:
             self.claw_y = max(REST_Y, self.claw_y - 310 * dt)
-            if self.claw_y <= REST_Y:
-                if self.held_id is not None:
-                    self.set_state(State.CARRY)
-                    self.target_x = self.claw_x
-                    self.message = "Caught! Move LEFT to DROP, then click to release."
-                else:
-                    self.misses += 1
-                    self.events.append(("miss", None))
-                    self.set_state(State.LOST if self.misses == 3 else State.MOVE)
-                    self.message = "Three empty grabs. Try a new round." if self.terminal else "Missed this time. Aim ahead of a moving ball."
         elif self.state == State.DROP:
             self.close_amount = approach(self.close_amount, 0, dt * 5)
 
@@ -322,8 +312,9 @@ class Game:
                 b.x = clamp(b.x, LEFT + b.radius, RIGHT - b.radius)
                 b.y = clamp(b.y, CEILING + b.radius, FLOOR - b.radius)
 
-        if self.state == State.CLOSE and self.held_id is None:
+        if self.state in (State.CLOSE, State.LIFT) and self.held_id is None:
             # Evaluate actual opposing contacts before resolving penetrations.
+            # A supported ball may settle into a valid grip during the lift.
             for b in free:
                 if self._secure(b):
                     break
@@ -335,6 +326,19 @@ class Game:
                     points = self.jaw_points(side)
                     self._finger_collision(b, points[0], points[1])
                     self._finger_collision(b, points[1], points[2])
+
+        # Resolve the top arrival after checking contacts, including this last
+        # lift step. A confirmed hold remains locked until an authorized DROP.
+        if self.state == State.LIFT and self.claw_y <= REST_Y:
+            if self.held_id is not None:
+                self.set_state(State.CARRY)
+                self.target_x = self.claw_x
+                self.message = "Caught! Move LEFT to DROP, then click to release."
+            else:
+                self.misses += 1
+                self.events.append(("miss", None))
+                self.set_state(State.LOST if self.misses == 3 else State.MOVE)
+                self.message = "Three empty grabs. Try a new round." if self.terminal else "Missed this time. Aim ahead of a moving ball."
         for b in free:
             if int(self.clock * 120) % 4 == 0:
                 b.trail.append((b.x, b.y))
@@ -352,7 +356,7 @@ class Game:
         lane = self.spawn_count % 3
         # Every fourth launch is a bullet; regular balls always remain available.
         bullet = self.level == 3 and self.spawn_count % 4 == 3
-        speed = self.rng.uniform(360, 430) if self.level == 2 else self.rng.uniform(540, 640)
+        speed = self.rng.uniform(320, 380) if self.level == 2 else self.rng.uniform(540, 640)
         self.balls.append(Ball(
             1000 + self.spawn_count, 166, self.jet_heights[lane],
             vx=speed + (140 if bullet else 0),

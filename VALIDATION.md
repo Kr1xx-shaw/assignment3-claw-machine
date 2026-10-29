@@ -1,5 +1,21 @@
 # Validation record — 24 October 2026
 
+## Fine tuning — 29 October 2026
+
+All **41 automated checks passed** after the small Level 2 speed reduction,
+lifting-contact fix and repeated-color reward change. New regressions verify
+that a ball touching both fingers on the final lift step locks, stays held
+during carriage movement and a five-second wait, while one-finger contacts and
+bullets never lock. A separate reward check verifies that each new color still
+pays 100 while subsequent same-color deliveries pay 200, including across levels.
+A natural full-round replay now secures a formerly rejected supported ball.
+Five before/after replays that previously returned empty now reach a confirmed
+carry, using real physics and identical aim/timing rather than a forced attachment.
+
+Level 2 uses 320–380 pixels/second (about 11% slower than the preceding version).
+The original controller/input and Windows-font checks also passed. Real
+participant validation of subjective difficulty is still pending.
+
 ## Faster streams and lowering fees
 
 The latest revision passes **37 automated checks**. Three new checks cover a

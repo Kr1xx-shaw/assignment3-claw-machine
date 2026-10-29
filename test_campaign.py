@@ -76,18 +76,28 @@ class EconomyTests(unittest.TestCase):
         a.request_start()
         for i in range(3):
             deliver(a, identity=100+i)
-        self.assertEqual(a.round_rewards, [100, 150, 200])
-        self.assertEqual(a.progress.coins, 600)
+        self.assertEqual(a.round_rewards, [100, 200, 200])
+        self.assertEqual(a.progress.coins, 650)
         self.assertEqual(a.progress.unlocked, 2)
         self.assertEqual(a.screen, 'result')
         a.update(20)
-        self.assertEqual(a.progress.coins, 600)
+        self.assertEqual(a.progress.coins, 650)
         a.request_start(2)
-        self.assertEqual(a.progress.coins, 400)
+        self.assertEqual(a.progress.coins, 450)
         self.assertEqual(a.game.balls, [])
         deliver(a)
-        self.assertEqual(a.round_rewards, [250])
+        self.assertEqual(a.round_rewards, [200])
         self.assertEqual(a.progress.coins, 600)
+
+    def test_different_color_keeps_its_first_reward(self):
+        a = Campaign(seed=7)
+        a.request_start()
+        for identity, color in enumerate((0, 0, 1), 100):
+            deliver(a, color=color, identity=identity)
+        self.assertEqual(a.round_rewards, [100, 200, 100])
+        self.assertEqual(a.next_reward(0), 200)
+        self.assertEqual(a.next_reward(1), 200)
+        self.assertEqual(a.next_reward(2), 100)
 
     def test_each_empty_attempt_deducts_once_and_three_end_the_round(self):
         a = Campaign(seed=7)
@@ -184,7 +194,7 @@ class EconomyTests(unittest.TestCase):
             self.assertEqual(a.game.state, State.WON)
         self.assertEqual(a.progress.cleared, [True]*3)
         self.assertEqual(a.progress.colors[0], 9)
-        self.assertEqual(a.progress.coins, 2150)
+        self.assertEqual(a.progress.coins, 1150)
         before = copy.deepcopy(a.progress)
         a.ask_reset()
         a.cancel()
@@ -265,14 +275,14 @@ class StreamTests(unittest.TestCase):
                     self.assertTrue(g.grip_confirmed)
             self.assertEqual(outcomes, [State.CARRY, State.MOVE])
 
-    def test_fast_streams_cross_the_cabinet_in_about_two_seconds_or_less(self):
-        for level, low, high in ((2, 360, 430), (3, 540, 640)):
+    def test_level_two_is_moderate_and_level_three_stays_fast(self):
+        for level, low, high in ((2, 320, 380), (3, 540, 640)):
             g = Game(7, level)
             g._spawn_stream(1)
             ball = g.balls[0]
             self.assertGreaterEqual(ball.vx, low)
             self.assertLessEqual(ball.vx, high)
-            self.assertLess((972-ball.x)/ball.vx, 2.25)
+            self.assertLess((972-ball.x)/ball.vx, 2.6)
             identity = ball.id
             for _ in range(120*3):
                 g.update(FIXED_DT)

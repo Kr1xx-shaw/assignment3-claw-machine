@@ -52,6 +52,53 @@ class GripTests(unittest.TestCase):
         self.g.close_amount = 0
         self.assertFalse(self.g._secure(Ball(100, 500, 563)))
 
+    def test_supported_ball_can_lock_on_last_lift_step_and_stay_held_at_top(self):
+        g = Game(11)
+        g.claw_x = g.target_x = 500
+        g.claw_y = REST_Y + 2.5
+        g.close_amount = 1
+        g.set_state(State.LIFT)
+        ball = Ball(100, 500, g.claw_y+37, vy=-310)
+        g.balls = [ball]
+        self.assertTrue(g.finger_contact(ball, -1))
+        self.assertTrue(g.finger_contact(ball, 1))
+        g.update(FIXED_DT)
+        self.assertEqual(g.state, State.CARRY)
+        self.assertIs(g.held_ball, ball)
+        self.assertEqual(g.misses, 0)
+        for x in (900, BIN_CENTER, 700, BIN_CENTER):
+            g.aim(x)
+            advance_until(g, lambda: abs(g.claw_x-x)<.1)
+            self.assertEqual(ball.mode, 'held')
+            self.assertAlmostEqual(ball.y-g.claw_y, g.held_offset[1])
+        for _ in range(120*5):
+            g.update(FIXED_DT)
+        self.assertEqual(g.state, State.CARRY)
+        self.assertIs(g.held_ball, ball)
+
+    def test_lifting_does_not_lock_single_finger_contacts_or_bullets(self):
+        for dx, kind in ((38, 'ball'), (0, 'bullet')):
+            g = Game(11)
+            g.claw_x, g.claw_y = 500, 500
+            g.close_amount = .62
+            g.set_state(State.LIFT)
+            g.balls = [Ball(100, 500+dx, 563, kind=kind)]
+            g.update(FIXED_DT)
+            self.assertIsNone(g.held_id)
+
+    def test_real_round_supported_ball_is_secured_during_lift(self):
+        # This replay previously lifted a two-finger-supported free ball, then
+        # returned empty because its center stayed just outside the old pocket.
+        g = Game(11)
+        g.aim(830)
+        for _ in range(round(1.6/FIXED_DT)):
+            g.update(FIXED_DT)
+        g.action()
+        advance_until(g, lambda: g.state in (State.CARRY, State.MOVE))
+        self.assertEqual(g.state, State.CARRY)
+        self.assertTrue(g.grip_confirmed)
+        self.assertEqual(g.misses, 0)
+
     def test_real_round_can_produce_successes_and_misses(self):
         results = []
         for x in (350, 430, 590, 900):

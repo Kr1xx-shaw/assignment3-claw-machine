@@ -75,6 +75,26 @@ Fill in after that real session (no participant name needed):
 
 ## Development history
 
+### Small difficulty adjustment, stable lifting and same-color reward — 29 October 2026
+
+The student reported that Level 2 had become slightly too difficult and that
+some balls appeared to reach the top with the claw before falling. Level 2
+launches were reduced from 360–430 to 320–380 pixels/second (about 11%).
+
+Inspection found that only the closing phase could confirm a grip. Simulated
+trials also found balls touching both lower fingers during lifting with their
+centers about 37 pixels below the claw, just outside the former 40-pixel cutoff.
+The valid pocket was widened slightly (36–75 vertical pixels and 0.75 ball radii
+laterally). Real opposing contacts can now confirm a hold during lifting, and
+top-arrival success/miss is resolved after the final contact check. A regression
+test follows the last-step capture through repeated movement and a five-second
+wait at the rail. One-finger contacts and bullets remain uncatchable.
+
+The student also requested 200 coins for the same color. Each color's first
+delivery pays 100, and all subsequent deliveries of that color pay 200 each.
+This replaces the earlier increasing 100/150/200/... schedule. Existing saved
+color counts remain valid and inform the next reward; balances are not recalculated.
+
 ### Faster streams and paid lowering
 
 The student reported that Levels 2 and 3 felt slower and easier than Level 1.

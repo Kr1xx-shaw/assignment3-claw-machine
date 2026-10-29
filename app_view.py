@@ -161,7 +161,7 @@ class AppView(View):
         self.button('help', 'HOW TO PLAY', (597, 573, 246, 45), BLUE, size=20)
         self.text('Collect 3 to win. 3 misses end the round.', 720, 630, 20, bold=True, center=True)
         if enough:
-            self.text('Each grab: -50  /  Empty grab: extra -50  /  Same color: higher rewards', 720, 659, 14, MUTED, center=True)
+            self.text('Each grab: -50 / Empty grab: extra -50 / New color: +100 / Same color: +200', 720, 659, 14, MUTED, center=True)
         else:
             self.text('Need 250 coins: 200 entry + 50 first grab. RESET ALL to start over.', 720, 659, 14, RED, True, True)
 
@@ -221,7 +221,7 @@ class AppView(View):
         for i in range(6):
             x = 1121+i*47
             self.circle(x, 645, 9, PALETTE[i][1])
-            self.text(str(100+50*a.progress.colors[i]), x, 661, 11, MUTED, center=True)
+            self.text(str(a.next_reward(i)), x, 661, 11, MUTED, center=True)
         if g.paused:
             label, enabled = 'PAUSED', False
         elif g.state == State.MOVE:
@@ -284,7 +284,7 @@ class AppView(View):
             ('02 / GRAB', 'Click to lower the claw. Both fingers must touch a ball to hold it.'),
             ('03 / DROP', 'Carry LEFT above the short bay. Click to open the hatch and deliver.'),
             ('COINS', 'Start with 500. Entry / retry: 200. Every grab: 50. Empty grab: extra 50.'),
-            ('COLOR BONUS', 'Each color pays 100, then 150, then 200, increasing by 50 each time.'),
+            ('COLOR BONUS', 'First delivery of a color: +100. Every later ball of that color: +200.'),
             ('PROGRESS', 'Deliver 3 to clear a level. Make 3 empty grabs and the round ends.'),
             ('RESET ALL', 'Need 250 for entry + first grab, or 50 to grab mid-round. Reset if short.'),
         ]

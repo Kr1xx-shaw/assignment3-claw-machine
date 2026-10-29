@@ -72,8 +72,7 @@ each delivered ball and the remaining room for mistakes.
 | Every valid lowering | -50, paid when the claw starts descending |
 | Empty grab | An additional -50, stopping at zero |
 | First delivered ball of each color | +100 |
-| Second / third ball of that color | +150 / +200 |
-| Each further ball of that color | Previous reward +50 |
+| Every later delivered ball of that color | +200 each |
 
 The color totals persist across levels and retries. A hold earns nothing until
 the ball reaches the left tray. The right panel shows the wallet, collected balls,
@@ -82,8 +81,8 @@ and net earnings. Best earnings mean gross rewards in a completed round.
 
 1. **AIR JET:** the original filled cabinet, with a right-side upward air jet.
 2. **CROSS CURRENT:** an initially empty cabinet. Three left jets launch balls
-   at 360–430 pixels/second toward a right-side recycler (about twice as fast
-   as before). Catch in transit and carry LEFT to score.
+   at 320–380 pixels/second toward a right-side recycler. This is about 11%
+   slower than the previous 360–430 range. Catch in transit and carry LEFT to score.
 3. **FAST & FURIOUS:** 540–640 pixels/second launches, changed jet angles/heights and occasional
    capsule-shaped bullets. Bullets cannot be held; a failed attempt is an empty
    grab. A mandatory illustrated explanation appears before every Level 3 entry.
@@ -130,6 +129,9 @@ inside the pocket, touch both opposing lower fingers, and have the closing tips
 below its centre with a gap narrow enough to retain it. Only then is a kinematic
 hold constraint created. The ball's current offset is retained rather than
 teleporting a distant ball into the claw. The hold remains stable during carry.
+The pocket has a small position tolerance. Both-finger contacts are checked while
+closing and lifting, including the final step at the rail, so a supported ball
+can settle into a secure hold instead of being declared empty at the top.
 
 The **short** left bay leaves the entire overhead transport corridor open. Its
 hatch opens for a verified delivery. An admission filter keeps ordinary free

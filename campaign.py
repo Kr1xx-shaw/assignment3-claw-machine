@@ -186,6 +186,9 @@ class Campaign:
         self.screen = 'menu'
         self.save()
 
+    def next_reward(self, color):
+        return 100 if self.progress.colors[color] == 0 else 200
+
     def update(self, elapsed):
         if self.screen != 'play':
             return
@@ -196,7 +199,7 @@ class Campaign:
         changed = False
         for kind, color in g.events:
             if kind == 'delivery':
-                reward = 100 + 50 * self.progress.colors[color]
+                reward = self.next_reward(color)
                 self.progress.colors[color] += 1
                 self.progress.coins += reward
                 self.round_earnings += reward
