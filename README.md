@@ -56,11 +56,12 @@ A successful grip does not award a point immediately: the ball must reach the
 tray. A miss is counted once when an empty claw returns. The right panel shows
 each delivered ball and the remaining room for mistakes.
 
-- **Space / Esc:** pause or resume.
+- **Esc:** pause or resume in every level. Space never pauses the game.
+- **Hold Space (Level 3 only):** slow free balls and bullets by 17%; release to restore speed.
 - **R / RETRY:** open a confirmation to retry the current level for 200 coins.
 - **Enter:** the same action as the main button.
 - **NEXT LEVEL / PLAY AGAIN:** a new paid entry after the result screen.
-- Moving to another window automatically pauses the round; press Space on return.
+- Moving to another window automatically pauses the round; press Esc on return.
 - Resize the window freely; the game keeps its aspect ratio and input coordinates.
 
 ## Coins, levels and saved progress
@@ -87,6 +88,18 @@ and net earnings. Best earnings mean gross rewards in a completed round.
    capsule-shaped bullets. Bullets cannot be held; a failed attempt is an empty
    grab. A mandatory illustrated explanation appears before every Level 3 entry.
    Reading it is free; its START button charges the fee.
+   **Bullet time:** hold Space for 83% ball/bullet speed; release for normal speed.
+   There are three activations per paid Level 3 round. A continuous hold uses one
+   activation, with no additional time limit. Repeated key events do not use extra
+   chances. The claw and released deliveries keep their normal speed. The launch
+   stream also slows so extra balls do not pile up. The right panel shows three
+   remaining-use dots and whether the effect is active.
+
+Pausing, switching windows, opening retry/reset or ending the round cancels active
+bullet time. The spent use is not refunded. Resume with Esc; a new activation needs
+a new Space press. A new paid attempt restores three uses. Levels 1 and 2 ignore Space.
+
+![Level 3 with bullet time active](assets/bullet-time.png)
 
 Free balls entering the right recycler never count as misses. Every level still
 requires three deliveries before three empty grabs. Only a win unlocks the next
@@ -159,7 +172,7 @@ uv run --no-project --python 3.12 python -m unittest -v test_game test_campaign
 The event-loop integration check uses Pygame and a headless display:
 
 ```powershell
-uv run --no-project --python 3.12 --with pygame==2.6.1 python -m unittest -v test_game test_campaign test_ui test_fonts
+uv run --no-project --python 3.12 --with pygame==2.6.1 python -m unittest -v test_game test_campaign test_ui test_fonts test_bullet_time
 ```
 
 The tests cover real opposing contacts, misses, the guarded opening, delivery,
@@ -186,7 +199,7 @@ fixtures. Normal gameplay never calls these helpers.
 - `model.py`: `Ball`, collision/grip logic and the round state machine.
 - `campaign.py`: paid entries, rewards, unlocks and atomic progress storage.
 - `view.py`, `app_view.py`: English flat illustration, menu and campaign screens.
-- `test_game.py`, `test_campaign.py`, `test_ui.py`, `test_fonts.py`: behavioural checks.
+- `test_game.py`, `test_campaign.py`, `test_ui.py`, `test_fonts.py`, `test_bullet_time.py`: behavioural checks.
 - `PROCESS.md`: design decisions, AI use and a clearly pending user-trial record.
 - `CREDITS.md`: course influence, tools and asset provenance.
 - `assets/`: actual rendered screenshots and the corrected design reference.

@@ -1,5 +1,17 @@
 # Validation record — 24 October 2026
 
+## Level 3 bullet time and Esc-only pause — 29 October 2026
+
+All **49 automated tests passed**. Eight new checks cover the three-use limit,
+17% slower ball/bullet displacement with a full-speed claw, immediate release
+restoration, slowed launch timing, pause/results, paid retry reset and stable
+gripping. Two of those checks drive the real event loop with Space down/repeat/up,
+Esc and focus-loss events and verify Space never pauses Levels 1 or 2.
+
+The Level 3 briefing, instructions, active and inactive bullet-time panels were
+rendered and visually inspected. The wallet and saved progression format are
+unchanged. Subjective playtesting remains pending.
+
 ## Fine tuning — 29 October 2026
 
 All **41 automated checks passed** after the small Level 2 speed reduction,

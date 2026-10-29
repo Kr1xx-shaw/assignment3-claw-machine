@@ -33,7 +33,7 @@ def dispatch(app, action):
     elif action == 'back':
         app.cancel()
     elif action == 'resume' and app.screen == 'play':
-        app.game.paused = False
+        app.game.set_paused(False)
     elif action == 'action' and app.screen == 'play':
         app.action()
     elif action and action.startswith('level_') and app.screen == 'menu':
@@ -47,7 +47,7 @@ def main():
     parser.add_argument('--seed', type=int, default=None)
     parser.add_argument('--save', type=Path, help='Optional alternate progress file.')
     parser.add_argument('--screenshot', type=Path, help='Render a headless preview without reading or writing player progress.')
-    parser.add_argument('--scene', choices=('start', 'level1', 'level2', 'level3', 'briefing', 'carry', 'drop', 'win', 'loss', 'reset', 'broke', 'help'), default='start')
+    parser.add_argument('--scene', choices=('start', 'level1', 'level2', 'level3', 'bullet-time', 'briefing', 'carry', 'drop', 'win', 'loss', 'reset', 'broke', 'help'), default='start')
     args = parser.parse_args()
     if args.screenshot:
         os.environ['SDL_VIDEODRIVER'] = 'dummy'
@@ -80,6 +80,7 @@ def main():
     pygame.display.set_caption('CLAW MACHINE | Three Levels')
     clock = pygame.time.Clock()
     running = True
+    space_down = False
     target = screen.get_rect()
     view.draw_app(app)
 
@@ -100,15 +101,29 @@ def main():
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.WINDOWFOCUSLOST:
+                    space_down = False
+                    if app.game:
+                        app.game.end_bullet_time()
                     if app.screen in ('play', 'retry') and app.game:
-                        app.game.paused = True
+                        app.game.set_paused(True)
+                elif event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
+                    space_down = False
+                    if app.game:
+                        app.game.end_bullet_time()
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    # One physical press spends one use; key-repeat events are ignored.
+                    if not space_down:
+                        space_down = True
+                        if app.screen == 'play':
+                            if app.game.level == 3:
+                                app.game.start_bullet_time()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE and app.screen != 'play':
                         app.cancel()
                     elif app.screen == 'play':
                         if event.key == pygame.K_r:
                             app.request_retry()
-                        elif event.key in (pygame.K_SPACE, pygame.K_ESCAPE):
+                        elif event.key == pygame.K_ESCAPE:
                             app.game.toggle_pause()
                         elif event.key == pygame.K_RETURN:
                             app.action()

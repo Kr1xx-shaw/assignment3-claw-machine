@@ -154,14 +154,19 @@ class Campaign:
 
     def request_retry(self):
         if self.screen == 'play':
+            self.game.end_bullet_time()
             self.screen = 'retry'
 
     def return_to_menu(self):
         # Only result/briefing screens may leave a paid round. A running round
         # can be paused or explicitly forfeited via the retry confirmation.
+        if self.game:
+            self.game.end_bullet_time()
         self.screen = 'menu'
 
     def ask_reset(self):
+        if self.game:
+            self.game.end_bullet_time()
         self.return_screen = self.screen
         self.screen = 'reset'
 

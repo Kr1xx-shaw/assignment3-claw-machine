@@ -55,7 +55,7 @@ class EventLoopTests(unittest.TestCase):
                 return event(pygame.MOUSEBUTTONDOWN, button=1, pos=(model.BIN_CENTER, 400))
             if phase == 'delivery' and len(game.collected)==1:
                 phase = 'pause'
-                return event(pygame.KEYDOWN, key=pygame.K_SPACE)
+                return event(pygame.KEYDOWN, key=pygame.K_ESCAPE)
             if phase == 'pause':
                 self.assertTrue(game.paused)
                 paused_snapshot = [(b.x, b.y) for b in game.balls]

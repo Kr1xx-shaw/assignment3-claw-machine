@@ -69,7 +69,7 @@ def campaign_scene(name):
         if name == 'broke':
             a.progress.coins = 50
         return a
-    if name in ('briefing', 'level3'):
+    if name in ('briefing', 'level3', 'bullet-time'):
         a.progress.unlocked = 3
         a.progress.cleared[:2] = [True, True]
         a.request_start(3)
@@ -82,9 +82,13 @@ def campaign_scene(name):
         a.request_start(2)
     else:
         a.request_start(1)
-    if name in ('level2', 'level3'):
+    if name in ('level2', 'level3', 'bullet-time'):
         for _ in range(120*4):
             a.update(1/120)
+        if name == 'bullet-time':
+            a.game.start_bullet_time()
+            for _ in range(30):
+                a.update(1/120)
     elif name in ('carry', 'drop', 'win', 'loss'):
         a.game = documentation_scene(name)
         attempts = a.game.attempts

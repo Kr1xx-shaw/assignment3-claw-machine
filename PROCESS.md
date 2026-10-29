@@ -75,6 +75,26 @@ Fill in after that real session (no participant name needed):
 
 ## Development history
 
+### Hold-to-use bullet time and unified pause key — 29 October 2026
+
+The student requested a Level 3 Space-held bullet-time mode that reduces speed
+by 17%, with three opportunities. They then clarified that pause should use Esc
+only in all levels. Space now has no action in Levels 1 and 2.
+
+Each new Space press in Level 3 consumes one use and slows free balls, bullets
+and the launch stream to 83% while held. The claw and delivered balls remain at
+normal speed. Release restores normal timing without changing stored velocities,
+so repeated presses do not compound the slowdown. A continuous hold has no extra
+time limit. Repeated key events are ignored. The right panel and pre-level
+briefing explain the control and remaining uses. This uses existing procedural
+illustration rather than adding external art assets.
+
+Pause, focus loss, retry/reset screens and results end the effect. A spent use
+is not refunded; a fresh paid Level 3 round gets three uses. Automated tests
+check the exact displacement ratio, full-speed claw, release, exhaustion, paused
+input, repeated key events, focus loss and stable gripping. No participant trial
+has been completed for these additions.
+
 ### Small difficulty adjustment, stable lifting and same-color reward — 29 October 2026
 
 The student reported that Level 2 had become slightly too difficult and that

@@ -318,8 +318,8 @@ class View:
     def footer(self, g):
         self.box((32, 806, 1376, 65), PAPER, 16)
         self.circle(57, 831, 5, ORANGE if g.paused else GREEN, False)
-        self.text('Paused. Press SPACE to continue.' if g.paused else g.message, 74, 816, 18, bold=True)
-        self.text('MOUSE to aim   /   CLICK to grab or drop   /   SPACE to pause   /   R to restart', 74, 845, 13, MUTED)
+        self.text('Paused. Press ESC to continue.' if g.paused else g.message, 74, 816, 18, bold=True)
+        self.text('MOUSE to aim   /   CLICK to grab or drop   /   ESC to pause   /   R to restart', 74, 845, 13, MUTED)
         self.text(f'ROUND {g.round_number:02}', 1313, 848, 11, MUTED, True)
 
     def overlay(self, g):
@@ -329,7 +329,7 @@ class View:
         rect = pygame.Rect(242, 315, 604, 280)
         self.box(rect, PAPER, 24, shadow=True)
         if g.paused:
-            title, subtitle, hint = 'TAKE A BREATHER', 'Your round is safely paused.', 'Press SPACE to continue'
+            title, subtitle, hint = 'TAKE A BREATHER', 'Your round is safely paused.', 'Press ESC to continue'
             self.text(title, 544, 359, 33, bold=True, center=True)
             self.text(subtitle, 544, 417, 20, MUTED, center=True)
             self.text(hint, 544, 491, 18, GREEN, True, True)

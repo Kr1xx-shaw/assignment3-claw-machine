@@ -217,11 +217,20 @@ class AppView(View):
             self.circle(1288+i*34, 519, 10, RED if i < g.misses else PAPER)
         self.text('Each grab -50 / Miss extra -50', 1104, 540, 14, MUTED)
         self.text(f'Earned +{a.round_earnings} / Spent -{a.round_penalties+a.round_grab_costs}', 1104, 576, 15, GREEN, True)
-        self.text('NEXT REWARD BY COLOR', 1104, 615, 11, MUTED, True)
-        for i in range(6):
-            x = 1121+i*47
-            self.circle(x, 645, 9, PALETTE[i][1])
-            self.text(str(a.next_reward(i)), x, 661, 11, MUTED, center=True)
+        if g.level == 3:
+            self.box((1102, 610, 282, 74), BLUE if g.bullet_time_active else CREAM, 12, MID_BLUE, 1)
+            self.text('BULLET TIME', 1114, 620, 15, bold=True)
+            self.text(f'{g.bullet_time_left}/3', 1261, 620, 14, MUTED, True, True)
+            for i in range(3):
+                self.circle(1310+i*25, 631, 7, ORANGE if i < g.bullet_time_left else STEEL)
+            status = 'ACTIVE / SPEED -17%' if g.bullet_time_active else ('HOLD SPACE / 3 USES PER ROUND' if g.bullet_time_left else 'NO USES LEFT')
+            self.text(status, 1114, 652, 12, GREEN if g.bullet_time_active else MUTED, True)
+        else:
+            self.text('NEXT REWARD BY COLOR', 1104, 615, 11, MUTED, True)
+            for i in range(6):
+                x = 1121+i*47
+                self.circle(x, 645, 9, PALETTE[i][1])
+                self.text(str(a.next_reward(i)), x, 661, 11, MUTED, center=True)
         if g.paused:
             label, enabled = 'PAUSED', False
         elif g.state == State.MOVE:
@@ -238,13 +247,17 @@ class AppView(View):
         self.box((32, 798, 1376, 53), PAPER, 14)
         message = a.notice if a.notice_time > 0 else g.message
         self.text(message, 50, 806, 17, GREEN if message.startswith('+') else INK, True)
-        self.text('MOUSE aim / CLICK grab or drop / SPACE pause / R paid retry', 50, 831, 12, MUTED)
+        controls = 'MOUSE aim / CLICK grab or drop / ESC pause / R paid retry'
+        if g.level == 3:
+            controls += ' / HOLD SPACE: bullet time -17%'
+        self.text(controls, 50, 831, 12, MUTED)
         self.text(f'ENTRY PAID: 200', 1225, 831, 12, MUTED, True)
 
     def pause_panel(self):
         self.box((270, 315, 570, 220), PAPER, 24, shadow=True)
         self.text('TAKE A BREATHER', 555, 347, 32, bold=True, center=True)
         self.text('Your round is paused. No extra entry charge.', 555, 398, 18, MUTED, center=True)
+        self.text('Press ESC or choose RESUME to continue.', 555, 428, 15, MUTED, center=True)
         self.button('resume', 'RESUME', (385, 450, 340, 56))
 
     def result(self):
@@ -286,14 +299,15 @@ class AppView(View):
             ('COINS', 'Start with 500. Entry / retry: 200. Every grab: 50. Empty grab: extra 50.'),
             ('COLOR BONUS', 'First delivery of a color: +100. Every later ball of that color: +200.'),
             ('PROGRESS', 'Deliver 3 to clear a level. Make 3 empty grabs and the round ends.'),
+            ('BULLET TIME', 'Level 3: hold SPACE to slow balls and bullets 17%. Release to stop. 3 uses per round.'),
             ('RESET ALL', 'Need 250 for entry + first grab, or 50 to grab mid-round. Reset if short.'),
         ]
         for i, (title, body) in enumerate(rows):
-            y = 145+i*80
+            y = 145+i*72
             self.box((65, y, 1310, 66), PAPER, 14, MID_BLUE, 1)
             self.text(title, 88, y+20, 19, bold=True)
             self.text(body, 303, y+20, 18, MUTED)
-        self.text('Recycled balls do not count as misses. Closing a round forfeits its entry fee.', 720, 730, 18, MUTED, center=True)
+        self.text('ESC pauses / resumes every level. Recycled balls do not count as misses.', 720, 735, 18, MUTED, center=True)
         self.button('back', 'BACK', (520, 779, 400, 57))
 
     def briefing(self):
@@ -308,7 +322,8 @@ class AppView(View):
         self.bullet(985, 374, 2.2)
         self.text('BULLETS', 985, 449, 25, RED, True, True)
         self.text('Cannot be grabbed. Let them pass.', 985, 497, 19, MUTED, center=True)
-        self.text('Each grab costs 50 coins. An empty grab costs another 50 and one miss.', 720, 603, 21, bold=True, center=True)
+        self.text('HOLD SPACE: BALLS & BULLETS -17% SPEED / 3 USES', 720, 580, 22, GREEN, True, True)
+        self.text('Release to restore speed. ESC pauses. Each grab costs 50; an empty grab costs 50 more.', 720, 618, 17, bold=True, center=True)
         self.text('The entry fee is charged only when you press START below.', 720, 644, 18, MUTED, center=True)
         self.button('briefing_start', 'START LEVEL 3 / 200 COINS', (395, 701, 650, 65))
         self.button('back', 'BACK', (570, 790, 300, 48), PAPER, size=18)

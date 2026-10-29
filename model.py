@@ -17,6 +17,8 @@ NOZZLE_LEFT, NOZZLE_RIGHT, NOZZLE_TOP = 910.0, 994.0, 699.0
 REST_Y, MAX_Y = 230.0, FLOOR - 84.0
 RADIUS, GRAVITY, FINGER_RADIUS = 24.0, 365.0, 5.0
 FIXED_DT = 1 / 120
+BULLET_TIME_SCALE = 0.83
+BULLET_TIME_USES = 3
 PALETTE = (
     ("CORAL", (248, 111, 106)), ("SKY", (72, 152, 234)),
     ("LEMON", (249, 201, 78)), ("MINT", (75, 190, 161)),
@@ -118,6 +120,8 @@ class Game:
         self.misses = 0
         self.attempts = 0
         self.paused = False
+        self.bullet_time_left = BULLET_TIME_USES if self.level == 3 else 0
+        self.bullet_time_held = False
         self.clock = 0.0
         self.state_time = 0.0
         self.accumulator = 0.0
@@ -135,6 +139,26 @@ class Game:
     @property
     def terminal(self):
         return self.state in (State.WON, State.LOST)
+
+    @property
+    def bullet_time_active(self):
+        return self.level == 3 and self.bullet_time_held and not self.paused and not self.terminal
+
+    def start_bullet_time(self):
+        if self.level != 3 or self.paused or self.terminal or self.bullet_time_held or self.bullet_time_left <= 0:
+            return False
+        self.bullet_time_left -= 1
+        self.bullet_time_held = True
+        return True
+
+    def end_bullet_time(self):
+        self.bullet_time_held = False
+
+    def set_paused(self, paused):
+        self.paused = paused
+        self.accumulator = 0.0
+        if paused:
+            self.end_bullet_time()
 
     @property
     def can_start_grab(self):
@@ -156,6 +180,8 @@ class Game:
     def set_state(self, state):
         self.state = state
         self.state_time = 0.0
+        if self.terminal:
+            self.end_bullet_time()
 
     def aim(self, x):
         if not self.paused and self.state in (State.MOVE, State.CARRY):
@@ -194,8 +220,7 @@ class Game:
 
     def toggle_pause(self):
         if not self.terminal:
-            self.paused = not self.paused
-            self.accumulator = 0.0
+            self.set_paused(not self.paused)
 
     def jaw_points(self, side):
         p = self.close_amount
@@ -246,8 +271,9 @@ class Game:
                 break
 
     def _step(self, dt):
+        world_dt = dt * (BULLET_TIME_SCALE if self.bullet_time_active else 1)
         if self.level > 1:
-            self._spawn_stream(dt)
+            self._spawn_stream(world_dt)
         self.clock += dt
         self.state_time += dt
         self.jet_flash = max(0.0, self.jet_flash - dt)
@@ -285,10 +311,11 @@ class Game:
         for b in list(self.balls):
             if b.mode == "held":
                 continue
-            b.jet_cooldown = max(0.0, b.jet_cooldown - dt)
-            b.vy = min(800, b.vy + (GRAVITY if self.level == 1 or b.mode == "delivery" else (0 if b.kind == "bullet" else 22)) * dt)
-            b.x += b.vx * dt
-            b.y += b.vy * dt
+            ball_dt = dt if b.mode == "delivery" else world_dt
+            b.jet_cooldown = max(0.0, b.jet_cooldown - ball_dt)
+            b.vy = min(800, b.vy + (GRAVITY if self.level == 1 or b.mode == "delivery" else (0 if b.kind == "bullet" else 22)) * ball_dt)
+            b.x += b.vx * ball_dt
+            b.y += b.vy * ball_dt
             if b.mode == "delivery":
                 self._delivery(b)
                 continue
@@ -298,7 +325,7 @@ class Game:
                     continue
                 self._stream_walls(b)
             else:
-                self._walls(b, dt)
+                self._walls(b, ball_dt)
                 self._nozzle(b)
             self._bin_guard(b)
 
