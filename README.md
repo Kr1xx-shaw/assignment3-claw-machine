@@ -57,7 +57,7 @@ tray. A miss is counted once when an empty claw returns. The right panel shows
 each delivered ball and the remaining room for mistakes.
 
 - **Esc:** pause or resume in every level. Space never pauses the game.
-- **Hold Space (Level 3 only):** slow free balls and bullets by 17%; release to restore speed.
+- **Hold Space (Level 3 only):** slow free balls and bullets by 33.6%; release to restore speed.
 - **R / RETRY:** open a confirmation to retry the current level for 200 coins.
 - **Enter:** the same action as the main button.
 - **NEXT LEVEL / PLAY AGAIN:** a new paid entry after the result screen.
@@ -88,7 +88,7 @@ and net earnings. Best earnings mean gross rewards in a completed round.
    capsule-shaped bullets. Bullets cannot be held; a failed attempt is an empty
    grab. A mandatory illustrated explanation appears before every Level 3 entry.
    Reading it is free; its START button charges the fee.
-   **Bullet time:** hold Space for 83% ball/bullet speed; release for normal speed.
+   **Bullet time:** hold Space for 66.4% ball/bullet speed; release for normal speed.
    There are three activations per paid Level 3 round. A continuous hold uses one
    activation, lasting at most **3.0 seconds**. The visible countdown uses ordinary
    time, so the slowdown does not stretch its duration. At zero, speed restores;

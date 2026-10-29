@@ -1,5 +1,12 @@
 # Validation record — 24 October 2026
 
+## Stronger bullet time — 29 October 2026
+
+All 12 targeted bullet-time checks passed after reducing speed to 66.4% of normal
+(20% slower than its previous 83% speed). The displacement check verifies 0.664
+for both free balls and bullets while the claw retains full speed. Launch timing,
+release, the three-second expiry, use limits, filter and keyboard controls passed.
+
 ## Bullet-time filter and countdown — 29 October 2026
 
 All **53 automated tests passed**. Four additional checks verify expiry after

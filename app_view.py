@@ -2,7 +2,7 @@
 import pygame
 
 from campaign import ENTRY_COST, GRAB_COST, LEVEL_NAMES
-from model import State, PALETTE, BIN_LEFT, FLOOR
+from model import State, PALETTE, BIN_LEFT, FLOOR, BULLET_TIME_SLOWDOWN
 from view import View, INK, CREAM, PAPER, BLUE, MID_BLUE, ORANGE, GREEN, RED, MUTED, STEEL, mix
 
 
@@ -240,7 +240,7 @@ class AppView(View):
             self.text(f'{g.bullet_time_left}/3', 1261, 620, 14, MUTED, True, True)
             for i in range(3):
                 self.circle(1310+i*25, 631, 7, ORANGE if i < g.bullet_time_left else STEEL)
-            status = 'ACTIVE / SPEED -17%' if g.bullet_time_active else ('HOLD SPACE / 3s PER USE' if g.bullet_time_left else 'NO USES LEFT')
+            status = f'ACTIVE / SPEED -{BULLET_TIME_SLOWDOWN}' if g.bullet_time_active else ('HOLD SPACE / 3s PER USE' if g.bullet_time_left else 'NO USES LEFT')
             self.text(status, 1114, 652, 12, GREEN if g.bullet_time_active else MUTED, True)
             if g.bullet_time_active:
                 self.text(f'{g.bullet_time_remaining:.1f}s', 1343, 644, 24, GREEN, True, True)
@@ -268,7 +268,7 @@ class AppView(View):
         self.text(message, 50, 806, 17, GREEN if message.startswith('+') else INK, True)
         controls = 'MOUSE aim / CLICK grab or drop / ESC pause / R paid retry'
         if g.level == 3:
-            controls += ' / HOLD SPACE: bullet time -17%'
+            controls += f' / HOLD SPACE: bullet time -{BULLET_TIME_SLOWDOWN}'
         self.text(controls, 50, 831, 12, MUTED)
         self.text(f'ENTRY PAID: 200', 1225, 831, 12, MUTED, True)
 
@@ -318,7 +318,7 @@ class AppView(View):
             ('COINS', 'Start with 500. Entry / retry: 200. Every grab: 50. Empty grab: extra 50.'),
             ('COLOR BONUS', 'First delivery of a color: +100. Every later ball of that color: +200.'),
             ('PROGRESS', 'Deliver 3 to clear a level. Make 3 empty grabs and the round ends.'),
-            ('BULLET TIME', 'Level 3: hold SPACE for -17% speed. 3 uses, up to 3.0s each. Release to stop early.'),
+            ('BULLET TIME', f'Level 3: hold SPACE for -{BULLET_TIME_SLOWDOWN} speed. 3 uses, up to 3.0s each. Release to stop early.'),
             ('RESET ALL', 'Need 250 for entry + first grab, or 50 to grab mid-round. Reset if short.'),
         ]
         for i, (title, body) in enumerate(rows):
@@ -341,7 +341,7 @@ class AppView(View):
         self.bullet(985, 374, 2.2)
         self.text('BULLETS', 985, 449, 25, RED, True, True)
         self.text('Cannot be grabbed. Let them pass.', 985, 497, 19, MUTED, center=True)
-        self.text('HOLD SPACE: -17% SPEED / 3 USES / 3.0s EACH', 720, 580, 22, GREEN, True, True)
+        self.text(f'HOLD SPACE: -{BULLET_TIME_SLOWDOWN} SPEED / 3 USES / 3.0s EACH', 720, 580, 22, GREEN, True, True)
         self.text('Release to restore speed. ESC pauses. Each grab costs 50; an empty grab costs 50 more.', 720, 618, 17, bold=True, center=True)
         self.text('The entry fee is charged only when you press START below.', 720, 644, 18, MUTED, center=True)
         self.button('briefing_start', 'START LEVEL 3 / 200 COINS', (395, 701, 650, 65))

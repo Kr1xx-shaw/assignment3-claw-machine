@@ -36,7 +36,7 @@ class BulletTimeTests(unittest.TestCase):
         self.assertFalse(g.start_bullet_time())
         self.assertEqual(g.bullet_time_left, 0)
 
-    def test_ball_and_bullet_travel_83_percent_while_claw_keeps_full_speed(self):
+    def test_ball_and_bullet_travel_66_4_percent_while_claw_keeps_full_speed(self):
         normal, slow = Game(7, 3), Game(7, 3)
         for g in (normal, slow):
             g.spawn_timer = 100
@@ -46,7 +46,7 @@ class BulletTimeTests(unittest.TestCase):
         advance(normal, 30)
         advance(slow, 30)
         for a, b in zip(normal.balls, slow.balls):
-            self.assertAlmostEqual((b.x-400)/(a.x-400), .83, places=10)
+            self.assertAlmostEqual((b.x-400)/(a.x-400), .664, places=10)
             self.assertEqual(a.vx, b.vx)
         self.assertAlmostEqual(normal.claw_x, slow.claw_x)
         slow.end_bullet_time()
@@ -63,7 +63,7 @@ class BulletTimeTests(unittest.TestCase):
         advance(slow, 61)
         self.assertEqual(normal.spawn_count, 1)
         self.assertEqual(slow.spawn_count, 0)
-        advance(slow, 13)
+        advance(slow, 31)
         self.assertEqual(slow.spawn_count, 1)
 
     def test_pause_and_result_end_effect_without_refunding_or_auto_restart(self):

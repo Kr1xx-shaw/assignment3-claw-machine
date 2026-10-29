@@ -75,6 +75,14 @@ Fill in after that real session (no participant name needed):
 
 ## Development history
 
+### Stronger bullet-time slowdown — 29 October 2026
+
+The student requested a further 20% speed reduction during bullet time. Applied
+relative to the existing 83% speed, the new multiplier is 0.83 x 0.80 = 0.664,
+or 66.4% of normal speed (33.6% total reduction). The interface derives its speed
+label from the same parameter. The three-second limit, three uses, filter and
+Esc pause controls continue to apply.
+
 ### Hold-to-use bullet time and unified pause key — 29 October 2026
 
 The student requested a Level 3 Space-held bullet-time mode that reduces speed
