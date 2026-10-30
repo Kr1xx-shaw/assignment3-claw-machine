@@ -1,4 +1,14 @@
-# Validation record — 24 October 2026
+# Validation record
+
+## Classmate playtesting update — 30 October 2026
+
+My classmates played the game and reported that Levels 2 and 3 were too difficult
+and that entry cost too many coins. I responded by lowering Level 2 speed,
+adding and strengthening Level 3 bullet time, and reducing entry/retry fees to
+100 coins. `PROCESS.md` records this feedback and the resulting decisions.
+
+The sections below preserve the automated checks from development. They verify
+program behavior and are separate from this real-player feedback.
 
 ## Entry fee reduced to 100 — 29 October 2026
 
@@ -24,7 +34,7 @@ remain unchanged, then verifies normal background restoration on release.
 
 The active filter/countdown, inactive state, instructions and Level 3 briefing
 were rendered and visually inspected. Every level continues to use Esc only
-for manual pause/resume. Real participant validation remains pending.
+for manual pause/resume. Classmate playtest feedback is recorded above and in `PROCESS.md`.
 
 ## Level 3 bullet time and Esc-only pause — 29 October 2026
 
@@ -36,7 +46,7 @@ Esc and focus-loss events and verify Space never pauses Levels 1 or 2.
 
 The Level 3 briefing, instructions, active and inactive bullet-time panels were
 rendered and visually inspected. The wallet and saved progression format are
-unchanged. Subjective playtesting remains pending.
+unchanged. Classmate feedback on difficulty is recorded above.
 
 ## Fine tuning — 29 October 2026
 
@@ -51,8 +61,8 @@ Five before/after replays that previously returned empty now reach a confirmed
 carry, using real physics and identical aim/timing rather than a forced attachment.
 
 Level 2 uses 320–380 pixels/second (about 11% slower than the preceding version).
-The original controller/input and Windows-font checks also passed. Real
-participant validation of subjective difficulty is still pending.
+The original controller/input and Windows-font checks also passed. Classmate
+feedback on subjective difficulty is recorded above.
 
 ## Faster streams and lowering fees
 
@@ -70,7 +80,7 @@ since a faster bullet may already have left at any single snapshot time.
 
 New rules and accounting were rendered for menu, gameplay, briefing, help and
 results. Existing player saves retain their wallet, color totals and unlocks.
-Subjective difficulty still needs the pending real participant trial.
+The later classmate feedback on difficulty is recorded above.
 
 ## Campaign upgrade — 28 October 2026
 
@@ -80,7 +90,7 @@ was visually inspected, including its title, central illustration, entry fee,
 wallet, level cards and reset control. The integration click was updated to the
 new PLAY button and still verifies the charge and physical delivery flow.
 
-- **34 automated tests passed** in the student's cached Pygame runtime.
+- **34 automated tests passed** in my cached Pygame runtime.
   Coverage includes the original 17 physics checks, 13 campaign/storage/stream
   checks, three font regressions and the updated real-event-loop integration.
 - The event-loop test starts from the menu, pays 200, physically captures and
@@ -102,8 +112,8 @@ new PLAY button and still verifies the charge and physical delivery flow.
   overlap was corrected. Screenshot mode does not touch player saves.
 
 These are automated/headless checks and visual inspection of rendered frames,
-not a completed human participant trial. The real trial remains pending, including
-subjective difficulty and understanding of the new coin rules.
+not themselves a human participant trial. The separate classmate feedback and
+resulting adjustments are recorded above and in `PROCESS.md`.
 
 ## Completed
 
@@ -133,17 +143,17 @@ opened normally with the documented command or PLAY.cmd.
 screenshots. The drop scene follows real successful grabs. The win/loss images
 use explicit documentation state fixtures to inspect overlay layout.
 
-The classmate/user trial remains **pending**, as recorded in PROCESS.md.
-Difficulty tuning and subjective clarity must be checked during that real trial.
+The classmate feedback and difficulty/cost adjustments are recorded in
+`PROCESS.md`; these automated checks do not measure subjective clarity.
 
 ## Follow-up: Windows font-startup failure
 
-The student's supplied traceback was reproduced by making system-font discovery
+The traceback I supplied was reproduced by making system-font discovery
 raise the same TypeError. The renderer now loads Segoe UI files directly and
 falls back to the Pygame bundled font. Three font regressions cover broken font
 discovery, absent fonts and a corrupted font file. The event-loop test also
 disables system-font discovery with the same exception during its entire run.
 
 After the fix, all **21 tests passed** in the same cached `main-9435ffe77f63ab74`
-Python environment named in the student's traceback. A fresh `main.py
+Python environment named in my traceback. A fresh `main.py
 --screenshot` invocation also rendered the startup screen successfully.

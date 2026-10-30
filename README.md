@@ -204,7 +204,7 @@ fixtures. Normal gameplay never calls these helpers.
 - `campaign.py`: paid entries, rewards, unlocks and atomic progress storage.
 - `view.py`, `app_view.py`: English flat illustration, menu and campaign screens.
 - `test_game.py`, `test_campaign.py`, `test_ui.py`, `test_fonts.py`, `test_bullet_time.py`: behavioural checks.
-- `PROCESS.md`: design decisions, AI use and a clearly pending user-trial record.
+- `PROCESS.md`: design decisions, AI use and classmate playtest feedback with resulting changes.
 - `CREDITS.md`: course influence, tools and asset provenance.
 - `assets/`: actual rendered screenshots and the corrected design reference.
 
@@ -214,13 +214,15 @@ This is intentionally a 2D arcade simulation. Its valid-contact hold is simplifi
 there is no full rigid-body claw solver, grip-force simulation or random slipping.
 There are no sound effects, touch controls or live website. Saves are local to
 this computer; there is no account or cloud synchronization.
-Timing and difficulty still need a real participant trial. System font selection
+My classmates' playtesting informed the later-level difficulty and entry-fee
+adjustments documented in `PROCESS.md`. Further testing can refine timing and
+difficulty. System font selection
 may differ slightly between computers. On Windows, known Segoe UI files are
 loaded directly without enumerating the font registry; missing or unusable files
 fall back to Pygame's bundled font. The interface is vector-style, rendered
 to pixels by Pygame; the reference PNG is not an editable SVG.
 
-Before submitting, complete the real user trial in `PROCESS.md`, follow these
-instructions from a fresh terminal, and submit this project's public GitHub
-repository URL through Canvas.
+Before submitting, follow these instructions from a fresh terminal and check
+that `PROCESS.md` describes the playtest feedback and resulting changes. Submit
+this project's public GitHub repository URL through Canvas.
 
