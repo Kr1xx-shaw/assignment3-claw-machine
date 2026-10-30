@@ -54,19 +54,28 @@ not evidence of a classmate's usability experience.
 
 ## Classmate playtesting and changes
 
-My classmates played the game and told me that Levels 2 and 3 felt too difficult
-and that the entry fee was too high. I used their feedback to adjust both the
-challenge and the cost of playing again.
+I let my classmates try the game before I explained the controls. I observed
+that the moving balls were too fast for them to catch reliably, which led to
+frequent empty grabs. They also told me that Levels 2 and 3 felt too difficult
+and that the entry fee was too high.
+
+Repeated misses and the cost of entering later levels could leave players
+without enough coins to continue even before they reached three misses in that
+round. This made it very difficult to clear Levels 2 and 3. I treated the
+playtest feedback as both a timing problem and a balance problem between
+difficulty and coin costs.
 
 - **Level 2:** I reduced launch speed from 360–430 to 320–380 pixels/second,
   about 11% slower, to give players more time to aim.
-- **Level 3:** I added hold-to-use bullet time, then strengthened it to 66.4%
+- **Level 3:** I also felt that this level needed a more distinctive interaction,
+  so I added hold-to-use bullet time, then strengthened it to 66.4%
   of normal ball/bullet speed. It gives players three opportunities per round,
   lasting up to three seconds each, to make the faster stream more manageable.
 - **Entry fee:** I reduced entry and retry fees from 200 to 100 coins so that
   another attempt would cost less.
 
-These changes respond to the difficulty and cost concerns my classmates raised.
+I made these changes to give players more time to aim, make Level 3 feel more
+distinctive, and reduce the cost of continuing after mistakes.
 The automated checks elsewhere in this document verify program behavior; this
 section records the feedback from actual people playing the game.
 
